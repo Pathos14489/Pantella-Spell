@@ -1,12 +1,11 @@
 Scriptname MantellaRepository extends Quest  
 Spell property MantellaSpell auto
-SPELL Property MantellaEndSpell auto
-;Faction Property giafac_Sitters  Auto ;gia
-;Faction Property giafac_Sleepers  Auto ;gia
-;Faction Property giafac_talktome  Auto ;gia
+Faction Property giafac_Sitters  Auto ;gia
+Faction Property giafac_Sleepers  Auto ;gia
+Faction Property giafac_talktome  Auto ;gia
 Faction Property giafac_AllowFollower  Auto ;gia
 Faction Property giafac_AllowAnger  Auto ;gia
-;Faction Property giafac_AllowForgive  Auto ;gia
+Faction Property giafac_AllowForgive  Auto ;gia
 Faction Property giafac_AllowDialogue  Auto ;gia
 Faction Property giafac_Following  Auto ;gia
 Faction Property giafac_Mantella  Auto ;gia
@@ -37,6 +36,7 @@ bool property playerTrackingOnPlayerBowShot auto
 bool property playerTrackingOnSit auto
 bool property playerTrackingOnGetUp auto
 
+;variables below used by MCM_TargetTrackingSettings
 
 bool property targetTrackingItemAdded auto 
 bool property targetTrackingItemRemoved auto
@@ -50,13 +50,29 @@ bool property targetTrackingOnGetUp auto
 
 
 bool property AllowForNPCtoFollow auto ;gia
-;bool property followingNPCsit auto ;gia
-;bool property followingNPCsleep auto ;gia
-;bool property NPCstopandTalk auto ;gia
+bool property followingNPCsit auto ;gia
+bool property followingNPCsleep auto ;gia
+bool property NPCstopandTalk auto ;gia
 bool property NPCAnger auto ;gia
-;bool property NPCForgive auto ;gia
+bool property NPCForgive auto ;gia
 bool property NPCDialogue auto ;gia
 
+;variables below used by MCM_PlayerTrackingSettings
+bool property playerTrackingOnItemAdded auto
+bool property playerTrackingOnItemRemoved auto
+bool property playerTrackingOnSpellCast auto
+bool property playerTrackingOnHit auto
+bool property playerTrackingOnLocationChange auto
+bool property playerTrackingOnObjectEquipped auto
+bool property playerTrackingOnObjectUnequipped auto
+bool property playerTrackingOnPlayerBowShot auto
+bool property playerTrackingOnSit auto
+bool property playerTrackingOnGetUp auto
+;variables below used by MCM_MainSettings
+float property MantellaEffectResponseTimer auto
+int property MantellaListenerTextHotkey auto
+int property MantellaCustomGameEventHotkey auto
+bool property microphoneEnabled auto
 bool property NPCdebugSelectModeEnabled auto
 
 event OnInit()
@@ -86,6 +102,7 @@ event OnInit()
     playerTrackingOnGetUp = true
     
 
+    ;variables below used by MCM_TargetTrackingSettings
     targetTrackingItemAdded = true
     targetTrackingItemRemoved = true
     targetTrackingOnSpellCast = true
@@ -96,20 +113,37 @@ event OnInit()
     targetTrackingOnSit = true
     targetTrackingOnGetUp = true
 	
-
-	;followingNPCsit = false ;gia
-	;followingNPCsleep = false ;gia
-	;NPCstopandTalk = false ;gia
+	followingNPCsit = false ;gia
+	followingNPCsleep = false ;gia
+	NPCstopandTalk = false ;gia
 	AllowForNPCtoFollow = false ;gia
 	NPCAnger = false ;gia
-	;NPCForgive = false ;gia
-	NPCDialogue = True ;gia
+	NPCForgive = false ;gia
+	NPCDialogue = false ;gia
+
     
+    ;variables below used by MCM_PlayerTrackingSettings
+    playerTrackingOnItemAdded = true
+    playerTrackingOnItemRemoved = true
+    playerTrackingOnSpellCast = true
+    playerTrackingOnHit = true
+    playerTrackingOnLocationChange = true
+    playerTrackingOnObjectEquipped = true
+    playerTrackingOnObjectUnequipped = true
+    playerTrackingOnPlayerBowShot = true
+    playerTrackingOnSit = true
+    playerTrackingOnGetUp = true
+    ;variables below used by MCM_MainSettings
+    MantellaEffectResponseTimer = 180
+    MantellaListenerTextHotkey = 35
+    BindPromptHotkey(MantellaListenerTextHotkey)
+    MantellaCustomGameEventHotkey = -1
+    microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
 endEvent
 
 function BindPromptHotkey(int keyCode)
-    ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
+    ;used by the MCM_MainSettings when updating the prompt hotkey KeyMapChange
     UnregisterForKey(MantellaListenerTextHotkey)
     MantellaListenerTextHotkey=keyCode
     RegisterForKey(keyCode)
@@ -123,7 +157,7 @@ function BindEndHotkey(int keyCode)
 endfunction
 
 function BindCustomGameEventHotkey(int keyCode)
-    ;used by the MCM_GeneralSettings when updating the custom game event hotkey KeyMapChange
+    ;used by the MCM_MainSettings when updating the custom game event hotkey KeyMapChange
     UnregisterForKey(MantellaCustomGameEventHotkey)
     MantellaCustomGameEventHotkey=keyCode
     RegisterForKey(keyCode)
@@ -156,7 +190,7 @@ Event OnKeyDown(int KeyCode)
                 String playerResponse = "False"
                 playerResponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
                 ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
-                if playerResponse == "True" ;&& !microphoneEnabled
+                if playerResponse == "True" && !microphoneEnabled
                     ;Debug.Notification("Forcing Conversation Through Hotkey")
                     UIExtensions.InitMenu("UITextEntryMenu")
                     UIExtensions.OpenMenu("UITextEntryMenu")
@@ -169,7 +203,7 @@ Event OnKeyDown(int KeyCode)
             endIf
         elseIf KeyCode == MantellaEndHotkey
             MantellaEndSpell.cast(Game.GetPlayer())
-        elseIf KeyCode == MantellaCustomGameEventHotkey
+        ElseIf KeyCode == MantellaCustomGameEventHotkey && !utility.IsInMenuMode() 
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.OpenMenu("UITextEntryMenu")
             string gameEventEntry = UIExtensions.GetMenuResultString("UITextEntryMenu")

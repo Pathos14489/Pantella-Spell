@@ -2,8 +2,8 @@ Scriptname MantellaEffectScript extends activemagiceffect
 
 Topic property MantellaDialogueLine auto
 ReferenceAlias property TargetRefAlias auto
-;Faction property DunPlayerAllyFactionProperty auto
-;Faction property PotentialFollowerFactionProperty auto
+;gia Faction property DunPlayerAllyFactionProperty auto
+;gia Faction property PotentialFollowerFactionProperty auto
 
 ;#############
 float localMenuTimer = 0.0
@@ -17,6 +17,8 @@ event OnEffectStart(Actor target, Actor caster)
 	;MiscUtil.WriteToFile("_mantella_end_conversation.txt", "False",  append=false)
     
     MiscUtil.WriteToFile("_mantella__skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in MantellaSoftware/config.ini", append=false)
+	; only run script if actor is not already selected
+	String currentActor = MiscUtil.ReadFromFile("_mantella_current_actor.txt") as String
     String activeActors = MiscUtil.ReadFromFile("_mantella_active_actors.txt") as String
     int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int
     String character_selection_enabled = MiscUtil.ReadFromFile("_mantella_character_selection.txt") as String
@@ -85,6 +87,7 @@ event OnEffectStart(Actor target, Actor caster)
             MiscUtil.WriteToFile("_mantella_active_actors.txt", " "+actorName+" ", append=true)
             MiscUtil.WriteToFile("_mantella_character_selection.txt", "False", append=false)
 		endIf
+		Debug.Notification("Starting conversation with " + actorName)
 		target.addtofaction(repository.giafac_Mantella);gia
 		
         String actorSex = target.getleveledactorbase().getsex()
@@ -115,6 +118,7 @@ event OnEffectStart(Actor target, Actor caster)
         Time = GetCurrentHourOfDay()
         MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
 
+        int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int
         actorCount += 1
         MiscUtil.WriteToFile("_mantella_actor_count.txt", actorCount, append=false)
 
@@ -159,6 +163,7 @@ event OnEffectStart(Actor target, Actor caster)
             ; Wait for Python / the script to give the green light to end the conversation
             sayFinalLine = MiscUtil.ReadFromFile("_mantella_end_conversation.txt") as String
         endWhile
+        Debug.Notification("Conversation ended.")
 		target.removefromfaction(repository.giafac_Mantella);gia
         radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
         if radiantDialogue == "True"
@@ -178,7 +183,7 @@ endEvent
 function MainConversationLoop(Actor target, Actor caster, String actorName, String actorRelationship, Int loopCount)
     String sayLine = MiscUtil.ReadFromFile("_mantella_say_line.txt") as String
     if sayLine != "False"
-        ;Debug.Notification(actorName + " is speaking.")
+        Debug.Notification(actorName + " is speaking.")
         MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
         target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
         target.SetLookAt(caster)
@@ -190,27 +195,25 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
         ; Check aggro status after every line spoken
         String aggro = MiscUtil.ReadFromFile("_mantella_aggro.txt") as String
         if aggro == "0"
-            if game.getplayer().isinfaction(Repository.giafac_AllowAnger)
-                Debug.Notification(actorName + " forgave you.")
-                target.StopCombat()
-			endif
+            if game.getplayer().isinfaction(Repository.giafac_AllowForgive)
+            Debug.Notification(actorName + " forgave you.")
+            target.StopCombat()
             MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
+			endif
         elseIf aggro == "1"
             if game.getplayer().isinfaction(Repository.giafac_AllowAnger)
-                Debug.Notification(actorName + " did not like that.")
-                ;target.UnsheatheWeapon()
-                ;target.SendTrespassAlarm(caster)
-                target.StartCombat(caster)
-            else
-                Debug.Notification("Aggro action not enabled in the Mantella MCM.")
-			Endif
+            Debug.Notification(actorName + " did not like that.")
+            ;target.UnsheatheWeapon()
+            ;target.SendTrespassAlarm(caster)
+            target.StartCombat(caster)
             MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
+			Endif
         elseif aggro == "2"
             if actorRelationship != "4"
-                ;Debug.Notification(actorName + " is willing to follow you.")
-                ;target.setrelationshiprank(caster, 4)
-                ;target.addtofaction(DunPlayerAllyFactionProperty)
-                ;target.addtofaction(PotentialFollowerFactionProperty)
+                Debug.Notification(actorName + " is willing to follow you.")
+                ;gia target.setrelationshiprank(caster, 4)
+                ;gia target.addtofaction(DunPlayerAllyFactionProperty)
+                ;gia target.addtofaction(PotentialFollowerFactionProperty)
                 if game.getplayer().isinfaction(repository.giafac_allowfollower)
 					Debug.Notification(actorName + " is following you.");gia
 					target.SetFactionRank(repository.giafac_following, 1);gia
@@ -267,13 +270,13 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
 endFunction
 
 
-function ConversationLoop(Actor target, Actor caster, String actorName, String sayLineFile)
+function ConversationLoop(Actor target, String actorName, String sayLineFile)
     String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
     if sayLine != "False"
-        ;Debug.Notification(actorName + " is speaking.")
+        ;gia Debug.Notification(actorName + " is speaking.")
         MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
         target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
-        ;target.SetLookAt(caster)
+        ;gia target.SetLookAt(caster)
 
         ; Set sayLine back to False once the voiceline has been triggered
         MiscUtil.WriteToFile(sayLineFile, "False",  append=false)

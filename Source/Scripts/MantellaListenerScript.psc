@@ -1,6 +1,7 @@
 Scriptname MantellaListenerScript extends ReferenceAlias
 
 Spell property MantellaSpell auto
+Spell property MantellaPower auto;gia
 MantellaRepository property repository auto
 Quest Property MantellaActorList  Auto  
 ReferenceAlias Property PotentialActor1  Auto  
@@ -8,8 +9,12 @@ ReferenceAlias Property PotentialActor2  Auto
 
 event OnInit()
     Game.GetPlayer().AddSpell(MantellaSpell)
-    Debug.Notification("Please save and reload to activate Mantella.")
+    Game.GetPlayer().AddSpell(MantellaPower);gia
+    Debug.Notification("Mantella Spell added.")
+    Debug.Notification("Mantella Hotkey is " + repository.mantellaHotkey)
+    Debug.Notification("IMPORTANT: Please save and reload to activate Mantella.")
 endEvent
+
 
 Float meterUnits = 71.0210
 Float Function ConvertMeterToGameUnits(Float meter)
