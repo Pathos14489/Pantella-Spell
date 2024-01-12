@@ -2,7 +2,7 @@ FormKey: 021216:Mantella.esp
 EditorID: gia_FollowerInventoryscript
 VirtualMachineAdapter:
   Scripts:
-  - Name: gia_Script
+  - Name: gia_MantellaScript
     Properties:
     - MutagenObjectType: ScriptObjectProperty
       Name: giafac_Follower
@@ -18,14 +18,14 @@ VirtualMachineAdapter:
       Object: 000803:Mantella.esp
   ScriptFragments:
     MutagenObjectType: ScriptFragments
-    FileName: gia_Script
+    FileName: gia_MantellaScript
     OnBegin:
       ExtraBindDataVersion: 1
-      ScriptName: gia_Script
+      ScriptName: gia_MantellaScript
       FragmentName: Fragment_1
     OnEnd:
       ExtraBindDataVersion: 1
-      ScriptName: gia_Script
+      ScriptName: gia_MantellaScript
       FragmentName: Fragment_0
 Flags: {}
 PreviousDialog: Null
