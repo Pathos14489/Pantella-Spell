@@ -1,5 +1,6 @@
 Scriptname MantellaRepository extends Quest  
 Spell property MantellaSpell auto
+Spell Property MantellaEndSpell auto
 Faction Property giafac_Sitters  Auto ;gia
 Faction Property giafac_Sleepers  Auto ;gia
 Faction Property giafac_talktome  Auto ;gia
