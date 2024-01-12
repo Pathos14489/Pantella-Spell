@@ -11,9 +11,9 @@ endfunction
 
 function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     ;This part of the MCM MainSettings script pretty much only serves to tell papyrus what button to display using properties from the repository
-    mcm.AddHeaderOption ("Button mapping")
-    mcm.oid_keymapPromptHotkey=mcm.AddKeyMapOption ("Text prompt/Initiate conversation", repository.MantellaListenerTextHotkey)  
-    mcm.oid_keymapCustomGameEventHotkey=mcm.AddKeyMapOption ("Enter text for custom game event", repository.MantellaCustomGameEventHotkey)  
+    ; mcm.AddHeaderOption ("Button mapping")
+    ; mcm.oid_keymapPromptHotkey=mcm.AddKeyMapOption ("Text prompt/Initiate conversation", repository.MantellaListenerTextHotkey)  
+    ; mcm.oid_keymapCustomGameEventHotkey=mcm.AddKeyMapOption ("Enter text for custom game event", repository.MantellaCustomGameEventHotkey)  
     
     mcm.AddHeaderOption("Microphone")
     mcm.oid_microphoneEnabledToggle = mcm.AddToggleOption("Enabled", repository.microphoneEnabled)
