@@ -269,14 +269,13 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
     endIf
 endFunction
 
-
-function ConversationLoop(Actor target, String actorName, String sayLineFile)
+function ConversationLoop(Actor target, Actor caster, String actorName, String sayLineFile)
     String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
     if sayLine != "False"
-        ;gia Debug.Notification(actorName + " is speaking.")
+        Debug.Notification(actorName + " is speaking.")
         MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
         target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
-        ;gia target.SetLookAt(caster)
+        target.SetLookAt(caster)
 
         ; Set sayLine back to False once the voiceline has been triggered
         MiscUtil.WriteToFile(sayLineFile, "False",  append=false)
