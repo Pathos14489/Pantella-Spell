@@ -22,20 +22,6 @@ int property oid_radiantenabled auto
 int property oid_radiantdistance auto
 int property oid_radiantfrequency auto
 
-
-int property oid_playerTrackingOnItemAdded auto
-int property oid_playerTrackingOnItemRemoved auto
-int property oid_playerTrackingOnSpellCast auto
-int property oid_playerTrackingOnHit auto
-int property oid_playerTrackingOnLocationChange auto
-int property oid_playerTrackingOnObjectEquipped auto
-int property oid_playerTrackingOnObjectUnequipped auto
-int property oid_playerTrackingOnPlayerBowShot auto
-int property oid_playerTrackingOnSit auto
-int property oid_playerTrackingOnGetUp auto
-int property oid_playerTrackingAll auto
-bool property playerAllToggle auto
-
 int property oid_targetTrackingItemAddedToggle auto
 int property oid_targetTrackingItemRemovedToggle auto
 int property oid_targetTrackingOnSpellCastToggle auto
@@ -61,7 +47,6 @@ int property oid_NPCDialogueToggle auto ;gia
 
 ;this toggle below is used in the TargetTrackingSettings
 bool property targetAllToggle auto
-int property oid_debugNPCSelectMode auto
 
 int property oid_playerTrackingOnItemAdded auto
 int property oid_playerTrackingOnItemRemoved auto
