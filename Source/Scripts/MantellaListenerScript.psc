@@ -11,7 +11,7 @@ event OnInit()
     Game.GetPlayer().AddSpell(MantellaSpell)
     Game.GetPlayer().AddSpell(MantellaPower);gia
     Debug.Notification("Mantella Spell added.")
-    Debug.Notification("Mantella Hotkey is " + repository.mantellaHotkey)
+    Debug.Notification("Mantella Hotkey is " + repository.MantellaCustomGameEventHotkey)
     Debug.Notification("IMPORTANT: Please save and reload to activate Mantella.")
 endEvent
 
