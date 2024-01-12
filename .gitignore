@@ -8,3 +8,5 @@ Source/Scripts/SKI_ConfigBase.psc
 .gitignore
 Source/TESV_Papyrus_Flags.flg
 Source/Scripts/SKI_QuestBase.psc
+Spriggit/
+Spriggit/*

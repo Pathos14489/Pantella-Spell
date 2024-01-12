@@ -28,7 +28,7 @@ event OnEffectStart(Actor target, Actor caster)
     String actorName = target.getdisplayname()
     String casterName = caster.getdisplayname()
 
-    ;if radiant dialogue between two NPCs, label them 1 & 2
+    ;if radiant dialogue between two NPCs of the same name, label them 1 & 2 to avoid confusion for the LLM
     if (casterName == actorName)
         if actorCount == 0
             actorName = actorName + " 1"
@@ -118,7 +118,7 @@ event OnEffectStart(Actor target, Actor caster)
         Time = GetCurrentHourOfDay()
         MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
 
-        int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int
+        ;int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int
         actorCount += 1
         MiscUtil.WriteToFile("_mantella_actor_count.txt", actorCount, append=false)
 

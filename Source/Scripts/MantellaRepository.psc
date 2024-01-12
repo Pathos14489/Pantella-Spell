@@ -11,13 +11,7 @@ Faction Property giafac_Following  Auto ;gia
 Faction Property giafac_Mantella  Auto ;gia
 quest property gia_FollowerQst auto ;gia
 
-
-bool property microphoneEnabled auto
-float property MantellaEffectResponseTimer auto
-
-int property MantellaListenerTextHotkey auto
 int property MantellaEndHotkey auto
-int property MantellaCustomGameEventHotkey auto
 int property MantellaRadiantHotkey auto
 
 bool property radiantEnabled auto
@@ -25,16 +19,6 @@ float property radiantDistance auto
 float property radiantFrequency auto
 
 
-bool property playerTrackingOnItemAdded auto
-bool property playerTrackingOnItemRemoved auto
-bool property playerTrackingOnSpellCast auto
-bool property playerTrackingOnHit auto
-bool property playerTrackingOnLocationChange auto
-bool property playerTrackingOnObjectEquipped auto
-bool property playerTrackingOnObjectUnequipped auto
-bool property playerTrackingOnPlayerBowShot auto
-bool property playerTrackingOnSit auto
-bool property playerTrackingOnGetUp auto
 
 ;variables below used by MCM_TargetTrackingSettings
 
