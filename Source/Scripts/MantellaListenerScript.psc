@@ -40,6 +40,8 @@ Event OnPlayerLoadGame()
     MiscUtil.WriteToFile("_mantella_player_name.txt", playerName, append=false)
     MiscUtil.WriteToFile("_mantella_player_race.txt", playerRace, append=false)
     MiscUtil.WriteToFile("_mantella_player_gender.txt", playerGender, append=false)
+    
+	MantellaMCM_MainSettings.ForceEndAllConversations(repository) ; Clean up any lingering conversations on load
 
     Debug.Notification("Mantella loaded - player is " + playerName + ", a " + playerGender + " " + playerRace + ".")
 EndEvent

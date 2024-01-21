@@ -17,6 +17,7 @@ int property oid_keymapCustomGameEventHotkey auto
 int property oid_microphoneEnabledToggle auto
 int property oid_debugNPCSelectMode auto
 int property oid_keymapRadiantHotkey auto
+int property oid_endFlagMantellaConversationAll auto
 
 int property oid_radiantenabled auto
 int property oid_radiantdistance auto
@@ -172,6 +173,8 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("This tracks if the Mantella Effect's target gets up from a chair or work area an item while the Mantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnGetUpToggle	
 		SetInfoText("Turns ON/OFF all tracking options for the target.")
+	elseif optionID ==oid_endFlagMantellaConversationAll
+		SetInfoText("Use this option to force all conversations to end. Use this if you there are multiple NPCs not part of a conversation that are repeating lines.")	
 
 
 	elseIf optionID ==oid_AllowForNPCtoFollowToggle ;gia	
@@ -216,3 +219,9 @@ Event OnOptionHighlight (Int optionID)
 	EndIf
 endEvent
 
+Event OnConfigClose ()
+    {Used to terminate all conversations}
+    If 	repository.endFlagMantellaConversationAll == true
+		MantellaMCM_MainSettings.EndAllConversations(self, repository)
+	EndIf
+EndEvent

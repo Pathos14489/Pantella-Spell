@@ -41,6 +41,7 @@ function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.AddHeaderOption("Actions")
 	mcm.oid_AllowForNPCtoFollowToggle = mcm.AddToggleOption("Allow Follow (Experimental)", Repository.AllowForNPCtoFollow)
 	mcm.oid_NPCAngerToggle = mcm.AddToggleOption("Allow Aggro", Repository.NPCAnger)
+    mcm.oid_endFlagMantellaConversationAll=mcm.AddToggleOption("Fix multiple NPC repeating lines bug", Repository.endFlagMantellaConversationAll)
 endfunction
 
 function SliderOptionOpen(MantellaMCM mcm, int optionID, MantellaRepository Repository) global
@@ -139,5 +140,22 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
         elseif (Repository.NPCAnger) == False
             game.getplayer().removefromfaction(Repository.giafac_AllowAnger)
         endif
+    elseif optionID==mcm.oid_endFlagMantellaConversationAll
+        Repository.endFlagMantellaConversationAll=!Repository.endFlagMantellaConversationAll
+        mcm.SetToggleOptionValue( mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
+        debug.messagebox("Terminating all conversations, close this menu for the change to take effect.")
     endif
 endfunction
+
+function EndAllConversations(MantellaMCM mcm,MantellaRepository Repository) global ; Ends all conversations with popups notifying the user
+    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+    Utility.wait(0.5)
+    repository.endFlagMantellaConversationAll = false
+    mcm.SetToggleOptionValue(mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
+    debug.messagebox("All ongoing conversations terminated. Restart Mantella.exe. The next conversation might need to be started twice.")
+Endfunction
+function ForceEndAllConversations(MantellaRepository Repository) global ; Quietly ends all conversations
+    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+    Utility.wait(0.5)
+    repository.endFlagMantellaConversationAll = false
+Endfunction

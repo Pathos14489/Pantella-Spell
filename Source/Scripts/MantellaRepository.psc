@@ -59,6 +59,7 @@ int property MantellaListenerTextHotkey auto
 int property MantellaCustomGameEventHotkey auto
 bool property microphoneEnabled auto
 bool property NPCdebugSelectModeEnabled auto
+bool property endFlagMantellaConversationAll auto
 
 event OnInit()
     microphoneEnabled = true
