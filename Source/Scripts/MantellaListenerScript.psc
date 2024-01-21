@@ -111,13 +111,15 @@ endEvent
 ;All the event listeners  below have 'if' clauses added after Mantella 0.9.2 (except ondying)
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
     if repository.playerTrackingOnItemAdded
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
         
         string itemName = akBaseItem.GetName()
-        string itemPickedUpMessage = "The player picked up " + itemName + ".\n"
+        string itemPickedUpMessage = playerName + " picked up " + itemName + ".\n"
 
         string sourceName = akSourceContainer.getbaseobject().getname()
         if sourceName != ""
-            itemPickedUpMessage = "The player picked up " + itemName + " from " + sourceName + ".\n"
+            itemPickedUpMessage = playerName + " picked up " + itemName + " from " + sourceName + ".\n"
         endIf
         
         if itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
@@ -130,12 +132,15 @@ EndEvent
 
 Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
     if Repository.playerTrackingOnItemRemoved
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+
         string itemName = akBaseItem.GetName()
-        string itemDroppedMessage = "The player dropped " + itemName + ".\n"
+        string itemDroppedMessage = playerName + " dropped " + itemName + ".\n"
 
         string destName = akDestContainer.getbaseobject().getname()
         if destName != ""
-            itemDroppedMessage = "The player placed " + itemName + " in/on " + destName + ".\n"
+            itemDroppedMessage = playerName + " placed " + itemName + " in/on " + destName + ".\n"
         endIf
         
         if itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
@@ -153,8 +158,11 @@ Event OnSpellCast(Form akSpell)
             if spellCast == "Mantella" || spellCast == "MantellaPower"
                 ; Do not save event if Mantella itself is cast
             else
-                ;Debug.Notification("The player casted the spell "+ spellCast)
-                MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player casted the spell " + spellCast + ".\n")
+                Actor player = Game.GetPlayer()
+                String playerName = player.GetActorBase().GetName()
+        
+                ;Debug.Notification(playerName + " casted the spell "+ spellCast)
+                MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " casted the spell " + spellCast + ".\n")
             endIf
         endIf
     endif
@@ -176,12 +184,15 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
             lastAggressor = aggressor
             timesHitSameAggressorSource = 0
 
+            Actor player = Game.GetPlayer()
+            String playerName = player.GetActorBase().GetName()
             if (hitSource == "None") || (hitSource == "")
+        
                 ;Debug.MessageBox(aggressor + " punched the player.")
-                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " punched the player.\n")
+                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " punched " + playerName + ".\n")
             else
                 ;Debug.MessageBox(aggressor + " hit the player with " + hitSource+".\n")
-                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " hit the player with " + hitSource+".\n")
+                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " hit " + playerName + " with " + hitSource+".\n")
             endIf
         else
             timesHitSameAggressorSource += 1
@@ -210,9 +221,12 @@ endEvent
 
 Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
     if repository.playerTrackingOnObjectEquipped
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+
         string itemEquipped = akBaseObject.getname()
-        ;Debug.MessageBox("The player equipped " + itemEquipped)
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player equipped " + itemEquipped + ".\n")
+        ;Debug.MessageBox(playerName + " equipped " + itemEquipped)
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " equipped " + itemEquipped + ".\n")
     endif
 endEvent
 
@@ -220,34 +234,34 @@ endEvent
 Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
     if repository.playerTrackingOnObjectUnequipped
         string itemUnequipped = akBaseObject.getname()
-        ;Debug.MessageBox("The player unequipped " + itemUnequipped)
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player unequipped " + itemUnequipped + ".\n")
+        ;Debug.MessageBox(playerName + " unequipped " + itemUnequipped)
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " unequipped " + itemUnequipped + ".\n")
     endif
 endEvent
 
 
 Event OnPlayerBowShot(Weapon akWeapon, Ammo akAmmo, float afPower, bool abSunGazing)
     if repository.playerTrackingOnPlayerBowShot
-        ;Debug.MessageBox("The player fired an arrow.")
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player fired an arrow.\n")
+        ;Debug.MessageBox(playerName + " fired an arrow.")
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " fired an arrow.\n")
     endif
 endEvent
 
 
 Event OnSit(ObjectReference akFurniture)
     if repository.playerTrackingOnSit
-        ;Debug.MessageBox("The player sat down.")
+        ;Debug.MessageBox(playerName + " sat down.")
         String furnitureName = akFurniture.getbaseobject().getname()
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player rested on / used a(n) "+furnitureName+".\n")
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " rested on / used a(n) "+furnitureName+".\n")
     endif
 endEvent
 
 
 Event OnGetUp(ObjectReference akFurniture)
     if repository.playerTrackingOnGetUp
-        ;Debug.MessageBox("The player stood up.")
+        ;Debug.MessageBox(playerName + " stood up.")
         String furnitureName = akFurniture.getbaseobject().getname()
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", "The player stood up from a(n) "+furnitureName+".\n")
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " stood up from a(n) "+furnitureName+".\n")
     endif
 EndEvent
 
