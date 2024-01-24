@@ -233,6 +233,9 @@ endEvent
 
 Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
     if repository.playerTrackingOnObjectUnequipped
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+
         string itemUnequipped = akBaseObject.getname()
         ;Debug.MessageBox(playerName + " unequipped " + itemUnequipped)
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " unequipped " + itemUnequipped + ".\n")
@@ -242,6 +245,9 @@ endEvent
 
 Event OnPlayerBowShot(Weapon akWeapon, Ammo akAmmo, float afPower, bool abSunGazing)
     if repository.playerTrackingOnPlayerBowShot
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+
         ;Debug.MessageBox(playerName + " fired an arrow.")
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " fired an arrow.\n")
     endif
@@ -250,6 +256,9 @@ endEvent
 
 Event OnSit(ObjectReference akFurniture)
     if repository.playerTrackingOnSit
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+
         ;Debug.MessageBox(playerName + " sat down.")
         String furnitureName = akFurniture.getbaseobject().getname()
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " rested on / used a(n) "+furnitureName+".\n")
@@ -259,6 +268,9 @@ endEvent
 
 Event OnGetUp(ObjectReference akFurniture)
     if repository.playerTrackingOnGetUp
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+        
         ;Debug.MessageBox(playerName + " stood up.")
         String furnitureName = akFurniture.getbaseobject().getname()
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " stood up from a(n) "+furnitureName+".\n")
