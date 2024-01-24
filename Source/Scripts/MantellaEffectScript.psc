@@ -36,6 +36,7 @@ event OnEffectStart(Actor target, Actor caster)
 
     String activeActors = MiscUtil.ReadFromFile("_mantella_active_actors.txt") as String ;get list of active actors from _mantella_active_actors.txt from Python
     int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int ;get number of actors from _mantella_actor_count.txt from Python
+    actorCount += 1 ; increment actorCount by 1 to account for the actor that was just added to a conversation
     String character_selection_enabled = MiscUtil.ReadFromFile("_mantella_character_selection.txt") as String
 
     Utility.Wait(0.5)
@@ -44,11 +45,11 @@ event OnEffectStart(Actor target, Actor caster)
     String casterName = caster.getdisplayname()
 
     ;if radiant dialogue between two NPCs of the same name, label them 1 & 2 to avoid confusion for the LLM
-    if (casterName == actorName)
-        if actorCount == 0
+    if (casterName == actorName) ; TODO: only handles case when conversation includes 2 actors with the same name. Would like to handle case when an arbitrary number of actors with the same name are in the conversation
+        if actorCount == 1 ;if this is the first actor selected, label them 1
             actorName = actorName + " 1"
             casterName = casterName + " 2"
-        elseIf actorCount == 1
+        elseIf actorCount == 2 ;if this is the second actor selected, label them 2
             actorName = actorName + " 2"
             casterName = casterName + " 1"
         endIf
@@ -62,7 +63,7 @@ event OnEffectStart(Actor target, Actor caster)
 
     String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
     
-    if (radiantDialogue == "True") && (caster == Game.GetPlayer()) && (actorAlreadyLoaded == false) ; if radiant dialogue is active without the actor selected by player, end the radiant dialogue
+    if (radiantDialogue == "True") && (caster == Game.GetPlayer()) && (actorAlreadyLoaded == false) ; if radiant dialogue is active without the actor selected by player, end the ongoing radiant conversation
         Debug.Notification("Ending radiant dialogue")
         MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
     elseIf (radiantDialogue == "True") && (actorAlreadyLoaded == true) && (caster == Game.GetPlayer()) ; if selected actor is in radiant dialogue, disable this mode to allow the player to join the conversation 
@@ -70,18 +71,25 @@ event OnEffectStart(Actor target, Actor caster)
         MiscUtil.WriteToFile("_mantella_radiant_dialogue.txt", "False",  append=false)
 	elseIf (actorAlreadyLoaded == false) && (character_selection_enabled == "True") ; if actor not already loaded and character selection is enabled
         TargetRefAlias.ForceRefTo(target)
-
-        String actorId = (target.getactorbase() as form).getformid()
+        
+        
+        ; Write Actor IDs to file for Python to read
+        ; get actor's BaseID
+        String actorBaseId = (target.getactorbase() as form).getformid() ; get actor's BaseID
+        ; get actor's RefID
+        String actorRefId = target.getformid() ; get actor's RefID
+        
 		if repository.NPCdebugSelectModeEnabled==true ; if debug select mode is active this will allow the user to enter in the RefID of the NPC bio/voice to have a conversation with
-            Debug.Messagebox("Enter the actor's RefID(in base 10) that you wish to speak to")
+            Debug.Messagebox("Enter the actor's RefID(in base 10) that you wish to speak to") ; TODO: Support BaseID input for debug select mode
             Utility.Wait(0.1)
 			UIExtensions.InitMenu("UITextEntryMenu")
 			UIExtensions.OpenMenu("UITextEntryMenu")
 			string result1 = UIExtensions.GetMenuResultString("UITextEntryMenu")
-			MiscUtil.WriteToFile("_mantella_current_actor_id.txt", result1, append=false)
+			MiscUtil.WriteToFile("_mantella_current_actor_ref_id.txt", result1, append=false)
 		else ; if debug select mode is not active, use the actor's RefID as the ID to have a conversation with
-		    MiscUtil.WriteToFile("_mantella_current_actor_id.txt", actorId, append=false)
+		    MiscUtil.WriteToFile("_mantella_current_actor_ref_id.txt", actorRefId, append=false)
 		endIf
+        MiscUtil.WriteToFile("_mantella_current_actor_base_id.txt", actorBaseId, append=false)
 
 
         ; Get NPC's name and save name to _mantella_current_actor.txt for Python to read
@@ -100,7 +108,7 @@ event OnEffectStart(Actor target, Actor caster)
             MiscUtil.WriteToFile("_mantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 		endIf
 
-		Debug.Notification(casterName + "is starting conversation with " + actorName)
+		Debug.Notification(casterName + " is starting conversation with " + actorName)
 		target.addtofaction(repository.giafac_Mantella);gia 
 		
         String actorSex = target.getleveledactorbase().getsex()
@@ -120,7 +128,7 @@ event OnEffectStart(Actor target, Actor caster)
             isEnemy = "True"
         endIf
         MiscUtil.WriteToFile("_mantella_actor_is_enemy.txt", isEnemy, append=false)
-
+        
         String currLoc = (caster.GetCurrentLocation() as form).getname()
         if currLoc == ""
             currLoc = "Skyrim"
@@ -131,8 +139,6 @@ event OnEffectStart(Actor target, Actor caster)
         Time = GetCurrentHourOfDay()
         MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
 
-        ;int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int
-        actorCount += 1
         MiscUtil.WriteToFile("_mantella_actor_count.txt", actorCount, append=false)
 
         if actorCount == 1 ; reset player input if this is the first actor selected
@@ -159,12 +165,12 @@ event OnEffectStart(Actor target, Actor caster)
 
         MiscUtil.WriteToFile("_mantella_character_selected.txt", "True", append=false)
 
-        ; Start conversation loop
+        ; Start conversation loop - this will run over and over until the conversation is ended
         While endConversation == "False" && repository.endFlagMantellaConversationAll==false
-            if actorCount == 1
+            if actorCount == 1 ; if this is the first actor selected, run the MainConversationLoop function
                 MainConversationLoop(target, caster, actorName, actorRelationship, loopCount)
                 loopCount += 1
-            else
+            else ; if this is not the first actor selected, run the ConversationLoop function
                 ConversationLoop(target, caster, actorName, sayLineFile)
             endif
             
@@ -195,7 +201,7 @@ event OnEffectStart(Actor target, Actor caster)
 endEvent
 
 
-function MainConversationLoop(Actor target, Actor caster, String actorName, String actorRelationship, Int loopCount)
+function MainConversationLoop(Actor target, Actor caster, String actorName, String actorRelationship, Int loopCount) ; this function is for the first actor selected in a conversation
     String sayLine = MiscUtil.ReadFromFile("_mantella_say_line.txt") as String
     if sayLine != "False"
         Debug.Notification(actorName + " is speaking.")
@@ -219,7 +225,7 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
             if game.getplayer().isinfaction(Repository.giafac_AllowAnger)
             Debug.Notification(actorName + " did not like that.")
             ;target.UnsheatheWeapon()
-            ;target.SendTrespassAlarm(caster)
+            ;target.SendTrespassAlarm(caster) 
             target.StartCombat(caster)
             MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
 			Endif
@@ -284,12 +290,12 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
     endIf
 endFunction
 
-function ConversationLoop(Actor target, Actor caster, String actorName, String sayLineFile)
+function ConversationLoop(Actor target, Actor caster, String actorName, String sayLineFile) ; this function is for all actors selected after the first actor in a conversation
     String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
     if sayLine != "False"
         Debug.Notification(actorName + " is speaking.")
-        Debug.Notification(sayLine)
-        Debug.Notification(sayLineFile)
+        ; Debug.Notification(sayLine)
+        ; Debug.Notification(sayLineFile)
         MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
         target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
         target.SetLookAt(caster)
