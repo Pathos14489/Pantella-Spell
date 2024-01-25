@@ -97,11 +97,9 @@ Event OnPageReset(string page)
 	elseif page=="Target tracking settings"
 		MantellaMCM_TargetTrackingSettings.Render(self, repository)
 		MantellaMCMcurrentPage="Target tracking settings"
- 	
-		elseif page=="Following NPC settings"
+	elseif page=="Following NPC settings"
 		MantellaMCM_FollowingNPCSettings.Render(self, repository)
 		MantellaMCMcurrentPage="Following NPC settings"
-	
 	endif		
 EndEvent
 ;This part of the MCM below is a bunch of event listeners, they all use functions to link to the appropriate MCM scripts 
@@ -112,11 +110,8 @@ Event OnOptionSelect(int optionID)
 		MantellaMCM_PlayerTrackingSettings.OptionUpdate(self,optionID, repository)	
 	elseif MantellaMCMcurrentPage =="Target tracking settings"
 		MantellaMCM_TargetTrackingSettings.OptionUpdate(self,optionID, repository)	
-
 	elseif MantellaMCMcurrentPage =="Following NPC settings" ;gia
 		MantellaMCM_FollowingNPCSettings.OptionUpdate(self,optionID, repository)	;gia
-
-	
 	endif
 EndEvent 
 

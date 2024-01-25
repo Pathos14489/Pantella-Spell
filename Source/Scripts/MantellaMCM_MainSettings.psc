@@ -10,28 +10,21 @@ function Render(MantellaMCM mcm, MantellaRepository Repository) global
 endfunction
 
 function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
-    ;This part of the MCM MainSettings script pretty much only serves to tell papyrus what button to display using properties from the repository
-    ; mcm.AddHeaderOption ("Button mapping")
-    ; mcm.oid_keymapPromptHotkey=mcm.AddKeyMapOption ("Text prompt/Initiate conversation", repository.MantellaListenerTextHotkey)  
-    ; mcm.oid_keymapCustomGameEventHotkey=mcm.AddKeyMapOption ("Enter text for custom game event", repository.MantellaCustomGameEventHotkey)  
-    
-    mcm.AddHeaderOption("Microphone")
-    mcm.oid_microphoneEnabledToggle = mcm.AddToggleOption("Enabled", repository.microphoneEnabled)
-    mcm.oid_responsetimeslider = mcm.AddSliderOption("Text Response Wait Time", repository.MantellaEffectResponseTimer)
-
     mcm.AddHeaderOption("Controls")
     mcm.oid_keymapPromptHotkey = mcm.AddKeyMapOption("Start Conversation / Open Text Prompt", repository.MantellaListenerTextHotkey)
     mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("End Conversation", repository.MantellaEndHotkey)
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
     mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
+
+    
+    mcm.AddHeaderOption("Settings")
+    mcm.oid_responsetimeslider=mcm.AddSliderOption ("Text Response wait time",repository.MantellaEffectResponseTimer)
+    mcm.oid_microphoneEnabledToggle=mcm.AddToggleOption("Microphone enabled", Repository.microphoneEnabled)
+    mcm.oid_debugNPCselectMode=mcm.AddToggleOption("NPC Debug Select Mode", Repository.NPCdebugSelectModeEnabled)
 endfunction
 
 function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
     ;This part of the MCM MainSettings script pretty much only serves to tell papyrus what button to display using properties from the repository
-    mcm.AddHeaderOption ("Settings")
-    mcm.oid_responsetimeslider=mcm.AddSliderOption ("Text Response wait time",repository.MantellaEffectResponseTimer)
-    mcm.oid_microphoneEnabledToggle=mcm.AddToggleOption("Microphone enabled", Repository.microphoneEnabled)
-    mcm.oid_debugNPCselectMode=mcm.AddToggleOption("NPC Debug Select Mode", Repository.NPCdebugSelectModeEnabled)
 
     mcm.AddHeaderOption("Radiant Dialogue")
     mcm.oid_radiantenabled = mcm.AddToggleOption("Enabled", repository.radiantEnabled)
