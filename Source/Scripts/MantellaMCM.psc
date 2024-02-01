@@ -12,6 +12,7 @@ MantellaRepository property repository auto
 ;oid variables are pretty much just int values to link to the correct button when displaying info with render functions
 int property oid_responsetimeslider auto
 int property oid_keymapPromptHotkey auto
+int property oid_keymapMantellaAddToConversationHotkey auto
 int property oid_keymapEndHotkey auto
 int property oid_keymapCustomGameEventHotkey auto
 int property oid_microphoneEnabledToggle auto
