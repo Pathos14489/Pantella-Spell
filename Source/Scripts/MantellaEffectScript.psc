@@ -75,9 +75,9 @@ event OnEffectStart(Actor target, Actor caster)
         
         ; Write Actor IDs to file for Python to read
         ; get actor's BaseID
-        String actorBaseId = (target.getactorbase() as form).getformid() ; get actor's BaseID
+        String actorBaseId = (target.getactorbase() as form).getformid() ; get actor's BaseID as int
         ; get actor's RefID
-        String actorRefId = target.getformid() ; get actor's RefID
+        String actorRefId = target.getformid() ; get actor's RefID as int
         
 		if repository.NPCdebugSelectModeEnabled==true ; if debug select mode is active this will allow the user to enter in the RefID of the NPC bio/voice to have a conversation with
             Debug.Messagebox("Enter the actor's RefID(in base 10) that you wish to speak to") ; TODO: Support BaseID input for debug select mode
@@ -135,9 +135,7 @@ event OnEffectStart(Actor target, Actor caster)
         endIf
         MiscUtil.WriteToFile("_mantella_current_location.txt", currLoc, append=false)
 
-        int Time
-        Time = GetCurrentHourOfDay()
-        MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
+        UpdateTime() ; update time to be used for the time of day in the conversation
 
         MiscUtil.WriteToFile("_mantella_actor_count.txt", actorCount, append=false)
 
@@ -252,8 +250,7 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
         endIf
 
         ; Update time (this may be too frequent)
-        int Time = GetCurrentHourOfDay()
-        MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
+        UpdateTime()
 
         caster.SetLookAt(target)
     endIf
@@ -290,6 +287,11 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
     endIf
 endFunction
 
+function UpdateTime()
+	string Time = Utility.GameTimeToString(Utility.GetCurrentGameTime()) ; Example: 07/12/0713 10:31 - Will be parsed in Python
+    MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
+endFunction
+
 function ConversationLoop(Actor target, Actor caster, String actorName, String sayLineFile) ; this function is for all actors selected after the first actor in a conversation
     String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
     if sayLine != "False"
@@ -306,16 +308,6 @@ function ConversationLoop(Actor target, Actor caster, String actorName, String s
     endIf
 endFunction
 
-
-int function GetCurrentHourOfDay()
-	float Time = Utility.GetCurrentGameTime()
-	Time -= Math.Floor(Time) ; Remove "previous in-game days passed" bit
-	Time *= 24 ; Convert from fraction of a day to number of hours
-	int Hour = Math.Floor(Time) ; Get whole hour
-	return Hour
-endFunction
-
-
 function SplitSubtitleIntoParts(String subtitle)
     String[] subtitles = PapyrusUtil.StringSplit(subtitle, ",")
     int subtitleNo = 0
@@ -324,7 +316,6 @@ function SplitSubtitleIntoParts(String subtitle)
         subtitleNo += 1
     endwhile
 endFunction
-
 
 function StartTimer()
 	localMenuTimer=180
