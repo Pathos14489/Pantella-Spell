@@ -247,6 +247,11 @@ function MainConversationLoop(Actor target, Actor caster, String actorName, Stri
 
                 MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
             endIf
+        elseif aggro == "3"
+            ; Cast MantellaEffect on player
+            Debug.Notification("Casting MantellaEffect on player from " + actorName)
+            Repository.MantellaSpell.cast(caster, game.getplayer())
+            MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
         endIf
 
         ; Update time (this may be too frequent)
@@ -328,7 +333,7 @@ function StartTimer()
 	String timerCheckEndConversation
 	;Debug.Notification("Timer is "+localMenuTimer)
 	While localMenuTimer >= 0 && repository.endFlagMantellaConversationAll==false
-		;Debug.Notification("Timer is "+localMenuTimer)
+		Debug.Notification("Timer is "+localMenuTimer)
 		Monitorplayerresponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
 		timerCheckEndConversation = MiscUtil.ReadFromFile("_mantella_end_conversation.txt") as String
 		;the next if clause checks if another conversation is already running and ends it.
@@ -347,6 +352,7 @@ function StartTimer()
 			endif
 			;Debug.Notification("Timer is "+localMenuTimer)
 		elseif localMenuTimer == 0
+            Debug.Notification("Timer is "+localMenuTimer)
 			Monitorplayerresponse = "False"
 			;added this as a safety check in case the player stays in a menu a long time.
 			Monitorplayerresponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
