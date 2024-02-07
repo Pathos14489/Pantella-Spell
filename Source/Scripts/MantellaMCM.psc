@@ -3,8 +3,6 @@ Scriptname MantellaMCM extends SKI_ConfigBase
 ;don't forget to set this in the CK!
 MantellaRepository property repository auto
 
-
-
 ;bool property microphoneEnabledToggle auto
 ;int property responsetimer auto
 ;string property mcmActorName auto
@@ -60,6 +58,10 @@ int property oid_playerTrackingOnObjectUnequipped auto
 int property oid_playerTrackingOnPlayerBowShot auto
 int property oid_playerTrackingOnSit auto
 int property oid_playerTrackingOnGetUp auto
+int property oid_playerTrackingOnVampireFeed auto
+int property oid_playerTrackingOnFastTravelEnd auto
+int property oid_playerTrackingOnVampirismStateChanged auto
+int property oid_playerTrackingOnLycanthropyStateChanged auto
 int property oid_playerTrackingAll auto
 
 ;this toggle below is used in the PlayerTrackingSettings
@@ -210,6 +212,14 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("This tracks if player sits down on a chair or work area an item while the Mantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnGetUp	
 		SetInfoText("This tracks if player gets up from a chair or work area an item while the Mantella Spell is active.")
+	elseIf optionID ==oid_playerTrackingOnVampireFeed
+		SetInfoText("This tracks if player feeds on a victim while the Mantella Spell is active.")
+	elseIf optionID ==oid_playerTrackingOnFastTravelEnd
+		SetInfoText("This tracks if player ends a fast travel while the Mantella Spell is active.")
+	elseIf optionID ==oid_playerTrackingOnVampirismStateChanged
+		SetInfoText("This tracks if player becomes a vampire or cures vampirism while the Mantella Spell is active.")
+	elseIf optionID ==oid_playerTrackingOnLycanthropyStateChanged
+		SetInfoText("This tracks if player becomes a werewolf or cures lycanthropy while the Mantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingAll	
 		SetInfoText("Turns ON/OFF all tracking options for the player.")
 	EndIf

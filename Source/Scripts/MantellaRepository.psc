@@ -33,7 +33,6 @@ bool property targetTrackingOnObjectUnequipped auto
 bool property targetTrackingOnSit auto
 bool property targetTrackingOnGetUp auto
 
-
 bool property AllowForNPCtoFollow auto ;gia
 bool property followingNPCsit auto ;gia
 bool property followingNPCsleep auto ;gia
@@ -41,7 +40,6 @@ bool property NPCstopandTalk auto ;gia
 bool property NPCAnger auto ;gia
 bool property NPCForgive auto ;gia
 bool property NPCDialogue auto ;gia
-
 ;variables below used by MCM_PlayerTrackingSettings
 bool property playerTrackingOnItemAdded auto
 bool property playerTrackingOnItemRemoved auto
@@ -53,6 +51,10 @@ bool property playerTrackingOnObjectUnequipped auto
 bool property playerTrackingOnPlayerBowShot auto
 bool property playerTrackingOnSit auto
 bool property playerTrackingOnGetUp auto
+bool property playerTrackingOnVampireFeed auto
+bool property playerTrackingOnFastTravelEnd auto
+bool property playerTrackingOnVampirismStateChanged auto
+bool property playerTrackingOnLycanthropyStateChanged auto
 ;variables below used by MCM_MainSettings
 float property MantellaEffectResponseTimer auto
 int property MantellaOpenTextInputHotkey auto
@@ -63,18 +65,7 @@ bool property NPCdebugSelectModeEnabled auto
 bool property endFlagMantellaConversationAll auto
 
 event OnInit()
-    microphoneEnabled = true
-    MantellaEffectResponseTimer = 180
-
-    MantellaEndHotkey = -1
-    MantellaCustomGameEventHotkey = -1
-    MantellaRadiantHotkey = -1
-
-    radiantEnabled = false
-    radiantDistance = 20
-    radiantFrequency = 10
-
-
+    ;variables below used by MCM_PlayerTrackingSettings
     playerTrackingOnItemAdded = true
     playerTrackingOnItemRemoved = true
     playerTrackingOnSpellCast = true
@@ -85,6 +76,10 @@ event OnInit()
     playerTrackingOnPlayerBowShot = true
     playerTrackingOnSit = true
     playerTrackingOnGetUp = true
+    playerTrackingOnVampireFeed = true
+    playerTrackingOnFastTravelEnd = true
+    playerTrackingOnVampirismStateChanged = true
+    playerTrackingOnLycanthropyStateChanged = true
     
 
     ;variables below used by MCM_TargetTrackingSettings
@@ -106,25 +101,19 @@ event OnInit()
 	NPCForgive = false ;gia
 	NPCDialogue = false ;gia
 
-    
-    ;variables below used by MCM_PlayerTrackingSettings
-    playerTrackingOnItemAdded = true
-    playerTrackingOnItemRemoved = true
-    playerTrackingOnSpellCast = true
-    playerTrackingOnHit = true
-    playerTrackingOnLocationChange = true
-    playerTrackingOnObjectEquipped = true
-    playerTrackingOnObjectUnequipped = true
-    playerTrackingOnPlayerBowShot = true
-    playerTrackingOnSit = true
-    playerTrackingOnGetUp = true
     ;variables below used by MCM_MainSettings
     MantellaEffectResponseTimer = 180
+    microphoneEnabled = true
+    radiantEnabled = false
+    radiantDistance = 20
+    radiantFrequency = 10
     MantellaOpenTextInputHotkey = 48 ; The default key is the "B" key
     MantellaAddToConversationHotkey = 35 ; The default key is the "H" key
     BindPromptHotkey(MantellaOpenTextInputHotkey) ; This function is defined in MantellaListener
     BindAddToConversationHotkey(MantellaAddToConversationHotkey) ; This function is defined in MantellaListener
-    MantellaCustomGameEventHotkey = -1
+    MantellaCustomGameEventHotkey = -1 ; Used to bind a hotkey to add a custom game event - Unbound by default
+    MantellaEndHotkey = -1 ; Used to bind a hotkey to end the conversation - Unbound by default
+    MantellaRadiantHotkey = -1 ; Used to bind a hotkey to enable/disable radiant dialogue - Unbound by default
     microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
 endEvent

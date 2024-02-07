@@ -15,7 +15,6 @@ event OnInit()
     Debug.Notification("IMPORTANT: Please save and reload to activate Mantella.")
 endEvent
 
-
 Float meterUnits = 71.0210
 Float Function ConvertMeterToGameUnits(Float meter)
     Return Meter * meterUnits
@@ -107,7 +106,6 @@ event OnUpdate()
     RegisterForSingleUpdate(repository.radiantFrequency)
 endEvent
 
-
 ;All the event listeners  below have 'if' clauses added after Mantella 0.9.2 (except ondying)
 Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akSourceContainer)
     if repository.playerTrackingOnItemAdded
@@ -129,7 +127,6 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
     endif
 EndEvent
 
-
 Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemReference, ObjectReference akDestContainer)
     if Repository.playerTrackingOnItemRemoved
         Actor player = Game.GetPlayer()
@@ -150,7 +147,6 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
     endif
 endEvent
 
-
 Event OnSpellCast(Form akSpell)
     if repository.playerTrackingOnSpellCast
     string spellCast = (akSpell as form).getname()
@@ -167,7 +163,6 @@ Event OnSpellCast(Form akSpell)
         endIf
     endif
 endEvent
-
 
 String lastHitSource = ""
 String lastAggressor = ""
@@ -200,7 +195,6 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
     endif
 EndEvent
 
-
 Event OnLocationChange(Location akOldLoc, Location akNewLoc)
     ; check if radiant dialogue is playing, and end conversation if the player leaves the area
     String radiant_dialogue_active = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
@@ -218,7 +212,6 @@ Event OnLocationChange(Location akOldLoc, Location akNewLoc)
     endif
 endEvent
 
-
 Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
     if repository.playerTrackingOnObjectEquipped
         Actor player = Game.GetPlayer()
@@ -229,7 +222,6 @@ Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " equipped " + itemEquipped + ".\n")
     endif
 endEvent
-
 
 Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
     if repository.playerTrackingOnObjectUnequipped
@@ -242,7 +234,6 @@ Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
     endif
 endEvent
 
-
 Event OnPlayerBowShot(Weapon akWeapon, Ammo akAmmo, float afPower, bool abSunGazing)
     if repository.playerTrackingOnPlayerBowShot
         Actor player = Game.GetPlayer()
@@ -252,7 +243,6 @@ Event OnPlayerBowShot(Weapon akWeapon, Ammo akAmmo, float afPower, bool abSunGaz
         MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " fired an arrow.\n")
     endif
 endEvent
-
 
 Event OnSit(ObjectReference akFurniture)
     if repository.playerTrackingOnSit
@@ -265,7 +255,6 @@ Event OnSit(ObjectReference akFurniture)
     endif
 endEvent
 
-
 Event OnGetUp(ObjectReference akFurniture)
     if repository.playerTrackingOnGetUp
         Actor player = Game.GetPlayer()
@@ -277,8 +266,44 @@ Event OnGetUp(ObjectReference akFurniture)
     endif
 EndEvent
 
-
 Event OnDying(Actor akKiller)
     MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
 EndEvent
 
+Event OnVampireFeed(Actor akTarget)
+    if repository.playerTrackingOnVampireFeed
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " sunk their long pointed fangs into " + akTarget.getdisplayname() + " supple neck flesh, and sucked their blood for some time.\n")
+    endif
+EndEvent
+Event OnPlayerFastTravelEnd(float afTravelDuration)
+    if repository.playerTrackingOnFastTravelEnd
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+        MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " travelled travelled for " + afTravelDuration + " hours.\n")
+    endif
+EndEvent
+Event OnVampirismStateChanged(bool abVampire)
+    if repository.playerTrackingOnVampirismStateChanged
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+        
+        if abVampire
+            MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " was turned into a vampire after succumbing to Sanguinare Vampiris.\n")
+        else
+            MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " cured their vampirism.\n")
+        endif
+    endif
+EndEvent
+Event OnLycanthropyStateChanged(Bool abIsWerewolf)
+    if repository.playerTrackingOnLycanthropyStateChanged
+        Actor player = Game.GetPlayer()
+        String playerName = player.GetActorBase().GetName()
+        if abIsWerewolf
+            MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " became a werewolf after contracting Sanies Lupinus.\n")
+        else
+            MiscUtil.WriteToFile("_mantella_in_game_events.txt", playerName + " cured their lycanthropy and is no longer a werewolf.\n")
+        endif
+    endif
+EndEvent

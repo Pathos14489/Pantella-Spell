@@ -22,6 +22,10 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_playerTrackingOnPlayerBowShot=mcm.AddToggleOption("Player shoots arrow", repository.playerTrackingOnPlayerBowShot)
     mcm.oid_playerTrackingOnSit=mcm.AddToggleOption("Player sitting", repository.playerTrackingOnSit)
     mcm.oid_playerTrackingOnGetUp=mcm.AddToggleOption("Player getting up", repository.playerTrackingOnGetUp)
+    mcm.oid_playerTrackingOnVampireFeed=mcm.AddToggleOption("Player feeding as vampire", repository.playerTrackingOnVampireFeed)
+    mcm.oid_playerTrackingOnFastTravelEnd=mcm.AddToggleOption("How long fast travel took", repository.playerTrackingOnFastTravelEnd)
+    mcm.oid_playerTrackingOnVampirismStateChanged=mcm.AddToggleOption("Player vampirism state changed", repository.playerTrackingOnVampirismStateChanged)
+    mcm.oid_playerTrackingOnLycanthropyStateChanged=mcm.AddToggleOption("Player lycanthropy state changed", repository.playerTrackingOnLycanthropyStateChanged)
     mcm.oid_playerTrackingAll=mcm.AddToggleOption("All", mcm.playerAllToggle)
 endfunction
 
@@ -61,11 +65,18 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
     ElseIf optionID==mcm.oid_playerTrackingOnGetUp
         repository.playerTrackingOnGetUp=!repository.playerTrackingOnGetUp
         mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnGetUp, repository.playerTrackingOnGetUp)
-    ;not using dying toggle cause this one is to end conversations on NPC death
-        ;ElseIf mcm.oid_targetTrackingOnDyingToggle
-    ;   mcm.targetTrackingOnDyingToggle=!mcm.targetTrackingOnDyingToggle
-    ;   mcm.SetToggleOptionValue( mcm.oid_targetTrackingOnDyingToggle, mcm.targetTrackingOnDyingToggle)
-    ;    Repository.targetTrackingOnDying=mcm.targetTrackingOnDyingToggle
+    ElseIf optionID==mcm.oid_playerTrackingOnVampireFeed
+        repository.playerTrackingOnVampireFeed=!repository.playerTrackingOnVampireFeed
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnVampireFeed, repository.playerTrackingOnVampireFeed)
+    ElseIf optionID==mcm.oid_playerTrackingOnFastTravelEnd
+        repository.playerTrackingOnFastTravelEnd=!repository.playerTrackingOnFastTravelEnd
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnFastTravelEnd, repository.playerTrackingOnFastTravelEnd)
+    ElseIf optionID==mcm.oid_playerTrackingOnVampirismStateChanged
+        repository.playerTrackingOnVampirismStateChanged=!repository.playerTrackingOnVampirismStateChanged
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnVampirismStateChanged, repository.playerTrackingOnVampirismStateChanged)
+    ElseIf optionID==mcm.oid_playerTrackingOnLycanthropyStateChanged
+        repository.playerTrackingOnLycanthropyStateChanged=!repository.playerTrackingOnLycanthropyStateChanged
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnLycanthropyStateChanged, repository.playerTrackingOnLycanthropyStateChanged)
     ElseIf optionID==mcm.oid_playerTrackingAll
         ;This part of the function OptionUpdate flips a bunch of variables in the repository at once :
         mcm.playerAllToggle=!mcm.playerAllToggle
@@ -79,6 +90,10 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
         mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnPlayerBowShot, mcm.playerAllToggle)
         mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnSit, mcm.playerAllToggle)
         mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnGetUp, mcm.playerAllToggle)
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnVampireFeed, mcm.playerAllToggle)
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnFastTravelEnd, mcm.playerAllToggle)
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnVampirismStateChanged, mcm.playerAllToggle)
+        mcm.SetToggleOptionValue( mcm.oid_playerTrackingOnLycanthropyStateChanged, mcm.playerAllToggle)
         mcm.SetToggleOptionValue( mcm.oid_playerTrackingAll, mcm.playerAllToggle)
         Repository.playerTrackingOnItemAdded=mcm.playerAllToggle
         Repository.playerTrackingOnItemRemoved=mcm.playerAllToggle
@@ -90,7 +105,10 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
         Repository.playerTrackingOnPlayerBowShot=mcm.playerAllToggle
         Repository.playerTrackingOnSit=mcm.playerAllToggle
         Repository.playerTrackingOnGetUp=mcm.playerAllToggle
-    
+        Repository.playerTrackingOnVampireFeed=mcm.playerAllToggle
+        Repository.playerTrackingOnFastTravelEnd=mcm.playerAllToggle
+        Repository.playerTrackingOnVampirismStateChanged=mcm.playerAllToggle
+        Repository.playerTrackingOnLycanthropyStateChanged=mcm.playerAllToggle
     endif
 endfunction 
 
