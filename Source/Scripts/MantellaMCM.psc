@@ -16,6 +16,8 @@ int property oid_keymapCustomGameEventHotkey auto
 int property oid_microphoneEnabledToggle auto
 int property oid_debugNPCSelectMode auto
 int property oid_keymapRadiantHotkey auto
+int property oid_keymapOpenContextMenuHotkey auto
+
 int property oid_endFlagMantellaConversationAll auto
 
 int property oid_radiantenabled auto
@@ -151,6 +153,10 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("This turn ON/OFF the microphone input for Mantella (requires Mantella.exe restart)")
 	elseIf optionID ==oid_debugNPCSelectMode	
 		SetInfoText("This allows the player to speak to any NPC by initiating a conversation then entering the actor RefID then the actor name that the player wishes to speak to")	
+	elseIf optionID ==oid_keymapRadiantHotkey
+		SetInfoText("This allows the player to toggle the Mantella Radiant effect on and off with a hotkey.")
+	elseIf optionID ==oid_keymapOpenContextMenuHotkey
+		SetInfoText("This allows the player to open the Mantella context menu with a hotkey. This can be used to tell the LLM something that everyone will know until you change it. e.g. '[Player Name] is a vampire.' or '[Player Name] is traveling with Lydia, his loyal housecarl.' etc.")
 	elseIf optionID ==oid_targetTrackingItemAddedToggle	
 		SetInfoText("This tracks if the Mantella Effect's target acquires an item while the Mantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingItemRemovedToggle	

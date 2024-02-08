@@ -22,7 +22,6 @@ float property radiantFrequency auto
 
 
 ;variables below used by MCM_TargetTrackingSettings
-
 bool property targetTrackingItemAdded auto 
 bool property targetTrackingItemRemoved auto
 bool property targetTrackingOnSpellCast auto
@@ -40,6 +39,7 @@ bool property NPCstopandTalk auto ;gia
 bool property NPCAnger auto ;gia
 bool property NPCForgive auto ;gia
 bool property NPCDialogue auto ;gia
+
 ;variables below used by MCM_PlayerTrackingSettings
 bool property playerTrackingOnItemAdded auto
 bool property playerTrackingOnItemRemoved auto
@@ -55,6 +55,7 @@ bool property playerTrackingOnVampireFeed auto
 bool property playerTrackingOnFastTravelEnd auto
 bool property playerTrackingOnVampirismStateChanged auto
 bool property playerTrackingOnLycanthropyStateChanged auto
+
 ;variables below used by MCM_MainSettings
 float property MantellaEffectResponseTimer auto
 int property MantellaOpenTextInputHotkey auto
@@ -63,6 +64,9 @@ int property MantellaCustomGameEventHotkey auto
 bool property microphoneEnabled auto
 bool property NPCdebugSelectModeEnabled auto
 bool property endFlagMantellaConversationAll auto
+
+string property context_string auto
+int property MantellaOpenContextMenuHotkey auto
 
 event OnInit()
     ;variables below used by MCM_PlayerTrackingSettings
@@ -107,15 +111,24 @@ event OnInit()
     radiantEnabled = false
     radiantDistance = 20
     radiantFrequency = 10
+    
     MantellaOpenTextInputHotkey = 48 ; The default key is the "B" key
     MantellaAddToConversationHotkey = 35 ; The default key is the "H" key
-    BindPromptHotkey(MantellaOpenTextInputHotkey) ; This function is defined in MantellaListener
-    BindAddToConversationHotkey(MantellaAddToConversationHotkey) ; This function is defined in MantellaListener
     MantellaCustomGameEventHotkey = -1 ; Used to bind a hotkey to add a custom game event - Unbound by default
     MantellaEndHotkey = -1 ; Used to bind a hotkey to end the conversation - Unbound by default
     MantellaRadiantHotkey = -1 ; Used to bind a hotkey to enable/disable radiant dialogue - Unbound by default
+    MantellaOpenContextMenuHotkey = -1 ; Used to bind a hotkey to open the context menu - Unbound by default
+    
+    BindPromptHotkey(MantellaOpenTextInputHotkey)
+    BindAddToConversationHotkey(MantellaAddToConversationHotkey)
+    BindEndHotkey(MantellaEndHotkey)
+    BindCustomGameEventHotkey(MantellaCustomGameEventHotkey)
+    BindRadiantHotkey(MantellaRadiantHotkey)
+    BindOpenContextMenuHotkey(MantellaOpenContextMenuHotkey)
+
     microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
+    context_string = "" ; This is the string that's fed to the prompt to give extra context to the LLM. When the player reopens the context input menu, this string is reloaded into the menu
 endEvent
 
 function BindPromptHotkey(int keyCode)
@@ -150,6 +163,13 @@ function BindRadiantHotkey(int keyCode)
     ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
     UnregisterForKey(MantellaRadiantHotkey)
     MantellaRadiantHotkey=keyCode
+    RegisterForKey(keyCode)
+endfunction
+
+function BindOpenContextMenuHotkey(int keyCode)
+    ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
+    UnregisterForKey(MantellaOpenContextMenuHotkey)
+    MantellaOpenContextMenuHotkey=keyCode
     RegisterForKey(keyCode)
 endfunction
 
@@ -204,6 +224,15 @@ Event OnKeyDown(int KeyCode)
             else
                 Debug.Notification("Radiant Dialogue Disabled")
             endif
+        elseif KeyCode == MantellaOpenContextMenuHotkey
+            Debug.Notification("Opening Context Menu with String: "+context_string)
+            UIExtensions.InitMenu("UITextEntryMenu")
+            UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
+            UIExtensions.OpenMenu("UITextEntryMenu")
+            UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
+            string contextString = UIExtensions.GetMenuResultString("UITextEntryMenu")
+            context_string = contextString
+            MiscUtil.WriteToFile("_mantella_context_string.txt", contextString, append=false)
         endif
     endif
 endEvent

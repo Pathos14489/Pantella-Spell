@@ -16,6 +16,7 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("End Conversation", repository.MantellaEndHotkey)
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
     mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
+    mcm.oid_keymapOpenContextMenuHotkey = mcm.AddKeyMapOption("Open Context Menu", repository.MantellaOpenContextMenuHotkey)
 
     
     mcm.AddHeaderOption("Settings")
@@ -77,7 +78,7 @@ endfunction
 
 function KeyMapChange(MantellaMCM mcm,Int option, Int keyCode, String conflictControl, String conflictName, MantellaRepository Repository) global
     ;This script is used to check if a key is already used, if it's not it will update to a new value (stored in MantellaRepository) or it will prompt the user to warn him of the conflict. The actual keybind happens in MantellaRepository
-    if option == mcm.oid_keymapPromptHotkey || mcm.oid_keymapCustomGameEventHotkey || mcm.oid_keymapEndHotkey || mcm.oid_keymapRadiantHotkey || mcm.oid_keymapMantellaAddToConversationHotkey
+    if option == mcm.oid_keymapPromptHotkey || mcm.oid_keymapCustomGameEventHotkey || mcm.oid_keymapEndHotkey || mcm.oid_keymapRadiantHotkey || mcm.oid_keymapMantellaAddToConversationHotkey || mcm.oid_keymapOpenContextMenuHotkey
         Bool continue = true
         ;below checks if there's already a bound key
         if conflictControl != ""
@@ -102,6 +103,8 @@ function KeyMapChange(MantellaMCM mcm,Int option, Int keyCode, String conflictCo
                 repository.BindRadiantHotkey(keyCode)
             elseif option == mcm.oid_keymapMantellaAddToConversationHotkey
                 repository.BindAddToConversationHotkey(keyCode)
+            elseif option == mcm.oid_keymapOpenContextMenuHotkey
+                repository.BindOpenContextMenuHotkey(keyCode)
             endif
         endIf
     endIf
