@@ -30,7 +30,7 @@ event OnEffectStart(Actor target, Actor caster)
     MiscUtil.WriteToFile("_mantella_player_race.txt", playerRace, append=false)
     MiscUtil.WriteToFile("_mantella_player_gender.txt", playerGender, append=false)
     
-    MiscUtil.WriteToFile("_mantella__skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in MantellaSoftware/config.ini", append=false)
+    MiscUtil.WriteToFile("_mantella_skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in MantellaSoftware/config.ini", append=false)
 	; only run script if actor is not already selected
 	; String currentActor = MiscUtil.ReadFromFile("_mantella_current_actor.txt") as String
 
@@ -491,6 +491,9 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
     elseIf methodName == "TakeOffShield"
         Debug.Notification("Taking off shield for " + targetName)
         target.UnequipItemSlot(39)
+    elseIf methodName == "MakePlayerFriend"
+        Debug.Notification("Making player friend of " + targetName)
+        target.MakePlayerFriend()
     elseIf methodName == "UnlockOwnedDoorsInCell"
         Debug.Notification(targetName + " is unlocking their owned doors in this cell.")
         target.UnlockOwnedDoorsInCell()
