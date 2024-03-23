@@ -2,6 +2,8 @@ Scriptname MantellaEffectScript extends activemagiceffect
 
 Topic property MantellaDialogueLine auto
 ReferenceAlias property TargetRefAlias auto
+Faction Property giafac_Following  Auto ;gia
+Faction Property giafac_Followering  Auto ;gia
 ;gia Faction property DunPlayerAllyFactionProperty auto
 ;gia Faction property PotentialFollowerFactionProperty auto
 
@@ -365,28 +367,22 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         target.SheatheWeapon()
     elseIf methodName == "FollowPlayer"
         if actorRelationship != "4"
-            Debug.Notification(targetName + " is willing to follow you.")
-            ;gia target.setrelationshiprank(caster, 4)
+            ; Debug.Notification(targetName + " is willing to follow you.")
+            ; gia target.setrelationshiprank(caster, 4)
             ;gia target.addtofaction(DunPlayerAllyFactionProperty)
             ;gia target.addtofaction(PotentialFollowerFactionProperty)
-            if game.getplayer().isinfaction(repository.giafac_allowfollower)
-                Debug.Notification(targetName + " is following you.");gia
-                target.SetFactionRank(repository.giafac_following, 1);gia
-                repository.gia_FollowerQst.reset();gia
-                repository.gia_FollowerQst.stop();gia
-                Utility.Wait(0.5);gia
-                repository.gia_FollowerQst.start();gia
-                target.EvaluatePackage();gia
-            else
-                Debug.Notification("Follow action not enabled in the Mantella MCM.")
-            endif
+            Debug.Notification(targetName + " is following you.");gia
+            target.addtofaction(giafac_Followering);gia 
+            target.SetFactionRank(giafac_Followering, 1);gia
+            target.EvaluatePackage();gia
         else
             Debug.Notification(targetName + " is already following you.")
         endIf
     elseIf methodName == "StopFollowingPlayer"
         Debug.Notification(targetName + " is no longer following you.")
-        target.SetFactionRank(repository.giafac_following, 0)
-        repository.gia_FollowerQst.stop()
+        target.RemoveFromFaction(giafac_Followering)
+        target.SetFactionRank(giafac_Followering, 0)
+        target.EvaluatePackage();gia
     elseIf methodName == "SetPlayerRelationshipRank"
         if args.Length == 1
             Debug.Notification("Setting relationship rank to " + args[0] + " for " + targetName)

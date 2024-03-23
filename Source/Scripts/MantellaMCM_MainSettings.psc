@@ -34,8 +34,8 @@ function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_radiantfrequency = mcm.AddSliderOption("Trigger Frequency",repository.radiantFrequency)
 
     mcm.AddHeaderOption("Actions")
-	mcm.oid_AllowForNPCtoFollowToggle = mcm.AddToggleOption("Allow Follow (Experimental)", Repository.AllowForNPCtoFollow)
-	mcm.oid_NPCAngerToggle = mcm.AddToggleOption("Allow Aggro", Repository.NPCAnger)
+	; mcm.oid_AllowForNPCtoFollowToggle = mcm.AddToggleOption("Allow Follow (Experimental)", Repository.AllowForNPCtoFollow)
+	; mcm.oid_NPCAngerToggle = mcm.AddToggleOption("Allow Aggro", Repository.NPCAnger)
     mcm.oid_endFlagMantellaConversationAll=mcm.AddToggleOption("Fix multiple NPC repeating lines bug", Repository.endFlagMantellaConversationAll)
 endfunction
 
@@ -123,22 +123,21 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
     elseIf optionID == mcm.oid_radiantenabled
         repository.radiantEnabled =! repository.radiantEnabled
         mcm.SetToggleOptionValue(mcm.oid_radiantenabled, repository.radiantEnabled)
-    elseIf optionID == mcm.oid_AllowForNPCtoFollowToggle
-        Repository.AllowForNPCtoFollow =! Repository.AllowForNPCtoFollow
-        mcm.SetToggleOptionValue(mcm.oid_AllowForNPCtoFollowToggle, Repository.AllowForNPCtoFollow)
-        if (Repository.AllowForNPCtoFollow) == True 
-            game.getplayer().addtofaction(Repository.giafac_AllowFollower)
-        elseif (Repository.AllowForNPCtoFollow) == False
-            game.getplayer().removefromfaction(Repository.giafac_AllowFollower)
-        endif
-    elseIf optionID == mcm.oid_NPCAngerToggle
-        Repository.NPCAnger =! Repository.NPCAnger
-        mcm.SetToggleOptionValue(mcm.oid_NPCAngerToggle, Repository.NPCAnger)
-        if (Repository.NPCAnger) == True 
-            game.getplayer().addtofaction(Repository.giafac_AllowAnger)
-        elseif (Repository.NPCAnger) == False
-            game.getplayer().removefromfaction(Repository.giafac_AllowAnger)
-        endif
+    ; elseIf optionID == mcm.oid_AllowForNPCtoToggle
+    ;     Repository.AllowForNPCtoFollow =! Repository.AllowForNPCtoFollow
+    ;     mcm.SetToggleOptionValue(mcm.oid_AllowForNPCtoFollowToggle, Repository.AllowForNPCtoFollow)
+    ;     if (Repository.AllowForNPCtoFollow) == True 
+    ;     elseif (Repository.AllowForNPCtoFollow) == False
+    ;         game.getplayer().removefromfaction(ReposFollowitory.giafac_AllowFollower)
+    ;     endif
+    ; elseIf optionID == mcm.oid_NPCAngerToggle
+    ;     Repository.NPCAnger =! Repository.NPCAnger
+    ;     mcm.SetToggleOptionValue(mcm.oid_NPCAngerToggle, Repository.NPCAnger)
+    ;     if (Repository.NPCAnger) == True 
+    ;         game.getplayer().addtofaction(Repository.giafac_AllowAnger)
+    ;     elseif (Repository.NPCAnger) == False
+    ;         game.getplayer().removefromfaction(Repository.giafac_AllowAnger)
+    ;     endif
     elseif optionID==mcm.oid_endFlagMantellaConversationAll
         Repository.endFlagMantellaConversationAll=!Repository.endFlagMantellaConversationAll
         mcm.SetToggleOptionValue( mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)

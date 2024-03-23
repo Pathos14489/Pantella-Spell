@@ -4,11 +4,10 @@ Spell Property MantellaEndSpell auto
 Faction Property giafac_Sitters  Auto ;gia
 Faction Property giafac_Sleepers  Auto ;gia
 Faction Property giafac_talktome  Auto ;gia
-Faction Property giafac_AllowFollower  Auto ;gia
-Faction Property giafac_AllowAnger  Auto ;gia
-Faction Property giafac_AllowForgive  Auto ;gia
-Faction Property giafac_AllowDialogue  Auto ;gia
-Faction Property giafac_Following  Auto ;gia
+; Faction Property giafac_AllowFollower  Auto ;gia
+; Faction Property giafac_AllowAnger  Auto ;gia
+; Faction Property giafac_AllowForgive  Auto ;gia
+; Faction Property giafac_AllowDialogue  Auto ;gia
 Faction Property giafac_Mantella  Auto ;gia
 quest property gia_FollowerQst auto ;gia
 
@@ -32,12 +31,12 @@ bool property targetTrackingOnObjectUnequipped auto
 bool property targetTrackingOnSit auto
 bool property targetTrackingOnGetUp auto
 
-bool property AllowForNPCtoFollow auto ;gia
 bool property followingNPCsit auto ;gia
 bool property followingNPCsleep auto ;gia
 bool property NPCstopandTalk auto ;gia
-bool property NPCAnger auto ;gia
-bool property NPCForgive auto ;gia
+; bool property AllowForNPCtoFollow auto ;gia
+; bool property NPCAnger auto ;gia
+; bool property NPCForgive auto ;gia
 bool property NPCDialogue auto ;gia
 
 ;variables below used by MCM_PlayerTrackingSettings
@@ -100,9 +99,9 @@ event OnInit()
 	followingNPCsit = false ;gia
 	followingNPCsleep = false ;gia
 	NPCstopandTalk = false ;gia
-	AllowForNPCtoFollow = false ;gia
-	NPCAnger = false ;gia
-	NPCForgive = false ;gia
+	; AllowForNPCtoFollow = false ;gia
+	; NPCAnger = false ;gia
+	; NPCForgive = false ;gia
 	NPCDialogue = false ;gia
 
     ;variables below used by MCM_MainSettings
@@ -129,6 +128,9 @@ event OnInit()
     microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
     context_string = "" ; This is the string that's fed to the prompt to give extra context to the LLM. When the player reopens the context input menu, this string is reloaded into the menu
+    ; game.getplayer().addtofaction(giafac_AllowFollower)
+    ; game.getplayer().addtofaction(giafac_AllowAnger)
+    ; game.getplayer().addtofaction(giafac_AllowForgive)
 endEvent
 
 function BindPromptHotkey(int keyCode)
@@ -176,7 +178,7 @@ endfunction
 Event OnKeyDown(int KeyCode)
     ;this function was previously in MantellaListener Script back in Mantella 0.9.2
 	;this ensures the right key is pressed and only activated while not in menu mode
-    if !utility.IsInMenuMode()
+    if !utility.IsInMenuMode() ; This ensures that the hotkeys only work when the player is not in a menu
         if KeyCode == MantellaOpenTextInputHotkey
             String playerResponse = "False"
             playerResponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled

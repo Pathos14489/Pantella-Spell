@@ -36,12 +36,12 @@ int property oid_targetTrackingOnGetUpToggle auto
 int property oid_targetTrackingOnDyingToggle auto
 int property oid_targetTrackingAll auto
 
-int property oid_AllowForNPCtoFollowToggle auto ;gia
+; int property oid_AllowForNPCtoFollowToggle auto ;gia
 int property oid_FollowingNPCsitToggle auto ;gia
 int property oid_FollowingNPCsleepToggle auto ;gia
 int property oid_NPCstopandTalkToggle auto ;gia
-int property oid_NPCAngerToggle auto ;gia
-int property oid_NPCForgiveToggle auto ;gia
+; int property oid_NPCAngerToggle auto ;gia
+; int property oid_NPCForgiveToggle auto ;gia
 int property oid_NPCDialogueToggle auto ;gia
 
 ;not tracking dying triggers they're only there as a check to end the conversation
@@ -181,8 +181,8 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("Use this option to force all conversations to end. Use this if you there are multiple NPCs not part of a conversation that are repeating lines.")	
 
 
-	elseIf optionID ==oid_AllowForNPCtoFollowToggle ;gia	
-		SetInfoText("Allow for NPCs to be Mantella followers.")
+	; elseIf optionID ==oid_AllowForNPCtoFollowToggle ;gia	
+	; 	SetInfoText("Allow for NPCs to be Mantella followers.")
 
 	elseIf optionID ==oid_FollowingNPCsitToggle ;gia	
 		SetInfoText("Mantella followers sit when player sits.")
@@ -190,10 +190,10 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("This must be enabled and the Player must be laying in bed to use dialogue to invite/uninvite followers to join them in a player owned bed. Does not pertain to rented beds. (player may have to exit the bed to uninvite or disable MCM toggle)")
 	elseIf optionID ==oid_NPCstopandTalkToggle ;gia	
 		SetInfoText("Prevents NPCs in conversations from moving around. e.g. Tap the same key as you would for opening a door on the NPC to get their attention during a conversation. To disengage simply walk away and they will resume their schedule")
-	elseIf optionID ==oid_NPCAngerToggle ;gia	
-		SetInfoText("Enable NPCs to become angry and attack the player for comments")
-	elseIf optionID ==oid_NPCForgiveToggle ;gia	
-		SetInfoText("Enable Angered NPCs to Forgive the player for comments")
+	; elseIf optionID ==oid_NPCAngerToggle ;gia	
+	; 	SetInfoText("Enable NPCs to become angry and attack the player for comments")
+	; elseIf optionID ==oid_NPCForgiveToggle ;gia	
+	; 	SetInfoText("Enable Angered NPCs to Forgive the player for comments")
 	elseIf optionID ==oid_NPCDialogueToggle ;gia	
 		SetInfoText("Enable Conversation though dialogue with NPCs")
 

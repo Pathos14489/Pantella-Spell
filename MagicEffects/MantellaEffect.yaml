@@ -23,9 +23,6 @@ VirtualMachineAdapter:
       Name: giafac_Following
       Object: 003806:Mantella.esp
     - MutagenObjectType: ScriptObjectProperty
-      Name: giafac_AllowFollower
-      Object: 03D416:Mantella.esp
-    - MutagenObjectType: ScriptObjectProperty
       Name: MantellaDialogueLine
       Object: 001D8A:Mantella.esp
     - MutagenObjectType: ScriptObjectProperty
