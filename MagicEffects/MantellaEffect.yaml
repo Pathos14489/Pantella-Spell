@@ -5,26 +5,11 @@ VirtualMachineAdapter:
   - Name: MantellaEffectScript
     Properties:
     - MutagenObjectType: ScriptObjectProperty
-      Name: PotentialFollowerFactionProperty
+      Name: PlayerFaction
+      Object: 000DB1:Skyrim.esm
+    - MutagenObjectType: ScriptObjectProperty
+      Name: PotentialFollowerFaction
       Object: 05C84D:Skyrim.esm
-    - MutagenObjectType: ScriptObjectProperty
-      Name: repository
-      Object: 000D62:Mantella.esp
-    - MutagenObjectType: ScriptObjectProperty
-      Name: DunPlayerAllyFactionProperty
-      Object: 05A1A4:Skyrim.esm
-    - MutagenObjectType: ScriptObjectProperty
-      Name: gia_FollowerQst
-      Object: 021211:Mantella.esp
-    - MutagenObjectType: ScriptObjectProperty
-      Name: giafac_Mantella
-      Object: 000803:Mantella.esp
-    - MutagenObjectType: ScriptObjectProperty
-      Name: giafac_Following
-      Object: 003806:Mantella.esp
-    - MutagenObjectType: ScriptObjectProperty
-      Name: giafac_AllowFollower
-      Object: 03D416:Mantella.esp
     - MutagenObjectType: ScriptObjectProperty
       Name: MantellaDialogueLine
       Object: 001D8A:Mantella.esp
@@ -32,6 +17,9 @@ VirtualMachineAdapter:
       Name: TargetRefAlias
       Object: 020E11:Mantella.esp
       Alias: 0
+    - MutagenObjectType: ScriptObjectProperty
+      Name: repository
+      Object: 000D62:Mantella.esp
 Name:
   TargetLanguage: English
   Value: MantellaEffect
@@ -46,4 +34,4 @@ CastingSoundLevel: Normal
 Sounds: []
 Description:
   TargetLanguage: English
-  Value: Starts a conversation with the target. The conversation can be ended by saying / typing the "goodbye" keyword.
+  Value: Starts a conversation with the target. The conversation can be ended by casting a second time on the target, or by simply saying the word "goodbye".

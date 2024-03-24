@@ -2,6 +2,8 @@ Scriptname MantellaEffectScript extends activemagiceffect
 
 Topic property MantellaDialogueLine auto
 ReferenceAlias property TargetRefAlias auto
+Faction Property PlayerFaction Auto
+Faction Property PotentialFollowerFaction Auto
 ;gia Faction property DunPlayerAllyFactionProperty auto
 ;gia Faction property PotentialFollowerFactionProperty auto
 
@@ -108,7 +110,6 @@ event OnEffectStart(Actor target, Actor caster)
             MiscUtil.WriteToFile("_mantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 		endIf
 
-		Debug.Notification(casterName + " is starting conversation with " + targetName)
 		target.addtofaction(repository.giafac_Mantella);gia 
 		
         String actorSex = target.getleveledactorbase().getsex()
@@ -146,7 +147,7 @@ event OnEffectStart(Actor target, Actor caster)
         endif
 
         if (caster == game.getplayer()) && actorCount == 1
-		    Debug.Notification("Starting conversation with " + targetName)
+            Debug.Notification(casterName + " is starting conversation with " + targetName)
         elseIf (caster == game.getplayer()) && actorCount >1
                 Debug.Notification("Adding " + targetName + " to conversation")
         elseIf actorCount == 1
@@ -218,14 +219,16 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
         String actorMethods = MiscUtil.ReadFromFile("_mantella_actor_methods.txt") as String
         String newActorMethods = ""
         if actorMethods != "" && actorMethods != "False" ; if the file is not empty or False
-            Debug.Notification("Found actor" + actorMethodsArray.Length as String + " methods.")
+            ; Debug.Notification("Found actor" + actorMethodsArray.Length as String + " methods.")
+            ; Debug.Notification("Actor INT ID:" + target.GetFormID() as String)
             String[] actorMethodsArray = PapyrusUtil.StringSplit(actorMethods, "\n")
             Int i = 0
             while i < actorMethodsArray.Length
+                ; Debug.Notification("Parsing Line: " + actorMethodsArray[i])
                 String[] actorMethod = PapyrusUtil.StringSplit(actorMethodsArray[i], "|")
                 int ref_id_int = actorMethod[0] as int
                 if ref_id_int == target.GetFormID() ; if the refID matches the target's refID
-                    Debug.Notification("Calling " + actorMethod[1] + " on " + targetName)
+                    Debug.Notification("Calling Method: " + actorMethod[1] + " on " + targetName)
                     if actorMethod.Length > 2
                         PythonActorMethodCall(caster, target, casterName, targetName, actorRelationship, actorMethod[1] as String, actorMethod[2] as String)
                     else
@@ -364,29 +367,28 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         Debug.Notification(targetName + " is sheathing their weapon.")
         target.SheatheWeapon()
     elseIf methodName == "FollowPlayer"
-        if actorRelationship != "4"
-            Debug.Notification(targetName + " is willing to follow you.")
-            ;gia target.setrelationshiprank(caster, 4)
-            ;gia target.addtofaction(DunPlayerAllyFactionProperty)
-            ;gia target.addtofaction(PotentialFollowerFactionProperty)
-            if game.getplayer().isinfaction(repository.giafac_allowfollower)
-                Debug.Notification(targetName + " is following you.");gia
-                target.SetFactionRank(repository.giafac_following, 1);gia
-                repository.gia_FollowerQst.reset();gia
-                repository.gia_FollowerQst.stop();gia
-                Utility.Wait(0.5);gia
-                repository.gia_FollowerQst.start();gia
-                target.EvaluatePackage();gia
-            else
-                Debug.Notification("Follow action not enabled in the Mantella MCM.")
-            endif
-        else
-            Debug.Notification(targetName + " is already following you.")
+        Debug.Notification(targetName + " is willing to follow you.")
+        if target.getrelationshiprank(game.getplayer()) < 4
+            target.SetRelationshipRank(game.getplayer(), 4)
         endIf
+        target.SetFactionRank(PlayerFaction, 1)
+        target.SetFactionRank(PotentialFollowerFaction, 1)
+        target.SetPlayerTeammate(True)
+        target.SetFactionRank(repository.giafac_following, 1);gia
+        repository.gia_FollowerQst.reset();gia
+        repository.gia_FollowerQst.stop();gia
+        Utility.Wait(0.5);gia
+        repository.gia_FollowerQst.start();gia
+        target.EvaluatePackage();gia
     elseIf methodName == "StopFollowingPlayer"
-        Debug.Notification(targetName + " is no longer following you.")
-        target.SetFactionRank(repository.giafac_following, 0)
-        repository.gia_FollowerQst.stop()
+        Debug.Notification(targetName + " is no longer willing to follow you.")
+        target.RemoveFromFaction(PlayerFaction);gia
+        target.RemoveFromFaction(PotentialFollowerFaction);gia
+        target.SetPlayerTeammate(False)
+        target.SetFactionRank(repository.giafac_following, 0);gia
+        repository.gia_FollowerQst.reset();gia
+        repository.gia_FollowerQst.stop();gia
+        target.EvaluatePackage();gia
     elseIf methodName == "SetPlayerRelationshipRank"
         if args.Length == 1
             Debug.Notification("Setting relationship rank to " + args[0] + " for " + targetName)
@@ -416,7 +418,7 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         Debug.Notification("Opening trade menu with " + targetName)
         target.ShowBarterMenu()
     elseIf methodName == "Intimidate"
-        Debug.Notification("Intimidating " + targetName)
+        Debug.Notification(casterName + " intimidated " + targetName)
         target.SetIntimidated(true)
     elseIf methodName == "Unintimidate"
         Debug.Notification("Unintimidating " + targetName)
