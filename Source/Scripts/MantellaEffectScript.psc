@@ -432,6 +432,16 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
     elseIf methodName == "SendAssaultAlarmPlayer"
         Debug.Notification("Sending assault alarm for player")
         target.SendAssaultAlarm()
+    elseIf methodName == "ArrestPlayer"
+        Debug.Notification("Arresting player")
+        Faction crime_fac = target.GetCrimeFaction()
+        if crime_fac != None
+            crime_fac.ModCrimeGold(100, true)
+        endIf
+        target.SendAssaultAlarm()
+    elseIf methodName == "PlayerResistingArrest"
+        Debug.Notification("Player is resisting arrest")
+        target.SetPlayerResistingArrest()
     elseIf methodName == "ForceActorValue" || methodName == "ForceAV"
         if args.Length == 2
             Debug.Notification("Forcing actor value " + args[0] + " to " + args[1] + " for " + targetName)
