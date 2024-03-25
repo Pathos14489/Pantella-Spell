@@ -210,13 +210,15 @@ Event OnKeyDown(int KeyCode)
                 endif
             endif
         elseif KeyCode == MantellaEndHotkey
-            MantellaEndSpell.cast(Game.GetPlayer())
+            MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
+            MiscUtil.WriteToFile("_mantella_text_input.txt", "EndConversationNow", append=false)
         elseif KeyCode == MantellaCustomGameEventHotkey && !utility.IsInMenuMode() 
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.OpenMenu("UITextEntryMenu")
             string gameEventEntry = UIExtensions.GetMenuResultString("UITextEntryMenu")
             gameEventEntry = gameEventEntry+"\n"
             MiscUtil.WriteToFile("_mantella_in_game_events.txt", gameEventEntry)
+            endFlagMantellaConversationAll = false
         elseif KeyCode == MantellaRadiantHotkey
             radiantEnabled =! radiantEnabled
             if radiantEnabled == True
