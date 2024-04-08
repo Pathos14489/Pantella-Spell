@@ -3,6 +3,7 @@ Scriptname MantellaEffectScript extends activemagiceffect
 Topic property MantellaDialogueLine auto
 ReferenceAlias property TargetRefAlias auto
 Faction Property PlayerFaction Auto
+Actor Property PlayerRef  Auto  
 Faction Property PotentialFollowerFaction Auto
 ;gia Faction property DunPlayerAllyFactionProperty auto
 ;gia Faction property PotentialFollowerFactionProperty auto
@@ -18,16 +19,16 @@ event OnEffectStart(Actor target, Actor caster)
 	;Utility.Wait(0.5)
 	;MiscUtil.WriteToFile("_mantella_end_conversation.txt", "False",  append=false)
     
-    Actor player = Game.GetPlayer()
-    String playerRace = player.GetRace().GetName()
-    Int playerGenderID = player.GetActorBase().GetSex()
+    PlayerRef = Game.GetPlayer()
+    String playerRace = PlayerRef.GetRace().GetName()
+    Int playerGenderID = PlayerRef.GetActorBase().GetSex()
     String playerGender = ""
     if (playerGenderID == 0)
         playerGender = "Male"
     else
         playerGender = "Female"
     endIf
-    String playerName = player.GetActorBase().GetName()
+    String playerName = PlayerRef.GetActorBase().GetName()
     MiscUtil.WriteToFile("_mantella_player_name.txt", playerName, append=false)
     MiscUtil.WriteToFile("_mantella_player_race.txt", playerRace, append=false)
     MiscUtil.WriteToFile("_mantella_player_gender.txt", playerGender, append=false)
@@ -64,14 +65,16 @@ event OnEffectStart(Actor target, Actor caster)
     endIf
 
     String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
+    Bool isCasterPlayer = (caster == PlayerRef)
+    Debug.Notification("isCasterPlayer: " + isCasterPlayer as String)
     
-    if (radiantDialogue == "True") && (caster == Game.GetPlayer()) && (actorAlreadyLoaded == false) ; if radiant dialogue is active without the actor selected by player, end the ongoing radiant conversation
+    if radiantDialogue == "True" && isCasterPlayer && actorAlreadyLoaded == false ; if radiant dialogue is active without the actor selected by player, end the ongoing radiant conversation
         Debug.Notification("Ending radiant dialogue")
         MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
-    elseIf (radiantDialogue == "True") && (actorAlreadyLoaded == true) && (caster == Game.GetPlayer()) ; if selected actor is in radiant dialogue, disable this mode to allow the player to join the conversation 
+    elseIf radiantDialogue == "True" && actorAlreadyLoaded == true && isCasterPlayer ; if selected actor is in radiant dialogue, disable this mode to allow the player to join the conversation 
         Debug.Notification("Adding player to conversation")
         MiscUtil.WriteToFile("_mantella_radiant_dialogue.txt", "False",  append=false)
-	elseIf (actorAlreadyLoaded == false) && (character_selection_enabled == "True") ; if actor not already loaded and character selection is enabled
+	elseIf actorAlreadyLoaded == false && character_selection_enabled == "True" ; if actor not already loaded and character selection is enabled
         TargetRefAlias.ForceRefTo(target)
         
         
@@ -112,20 +115,20 @@ event OnEffectStart(Actor target, Actor caster)
 
 		target.addtofaction(repository.giafac_Mantella);gia 
 		
-        String actorSex = target.getleveledactorbase().getsex()
+        String actorSex = target.GetLeveledActorBase().GetSex()
         MiscUtil.WriteToFile("_mantella_actor_sex.txt", actorSex, append=false)
 
-        String actorRace = target.getrace()
+        String actorRace = target.GetRace()
         MiscUtil.WriteToFile("_mantella_actor_race.txt", actorRace, append=false)
 
-        String actorRelationship = target.getrelationshiprank(game.getplayer())
+        String actorRelationship = target.GetRelationshipRank(PlayerRef)
         MiscUtil.WriteToFile("_mantella_actor_relationship.txt", actorRelationship, append=false)
 
         String actorVoiceType = target.GetVoiceType()
         MiscUtil.WriteToFile("_mantella_actor_voice.txt", actorVoiceType, append=false)
 
         String isEnemy = "False"
-        if (target.getcombattarget() == game.getplayer())
+        if (target.GetCombatTarget() == PlayerRef)
             isEnemy = "True"
         endIf
         MiscUtil.WriteToFile("_mantella_actor_is_enemy.txt", isEnemy, append=false)
@@ -146,9 +149,9 @@ event OnEffectStart(Actor target, Actor caster)
             MiscUtil.WriteToFile("_mantella_in_game_events.txt", "", append=False)
         endif
 
-        if (caster == game.getplayer()) && actorCount == 1
+        if isCasterPlayer && actorCount == 1
             Debug.Notification(casterName + " is starting conversation with " + targetName)
-        elseIf (caster == game.getplayer()) && actorCount >1
+        elseIf isCasterPlayer && actorCount >1
                 Debug.Notification("Adding " + targetName + " to conversation")
         elseIf actorCount == 1
             Debug.Notification("Starting radiant dialogue with " + targetName + " and " + casterName)
@@ -242,52 +245,6 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
             MiscUtil.WriteToFile("_mantella_actor_methods.txt", newActorMethods,  append=false)
         endIf
         
-        ; Debug.Notification("Done checking for actor methods")
-
-        ; ; Check aggro status after every line spoken
-        ; String aggro = MiscUtil.ReadFromFile("_mantella_aggro.txt") as String
-        ; if aggro == "0"
-        ;     if game.getplayer().isinfaction(Repository.giafac_AllowForgive)
-        ;     Debug.Notification(targetName + " forgave you.")
-        ;     target.StopCombat()
-        ;     MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
-		; 	endif
-        ; elseIf aggro == "1"
-        ;     if game.getplayer().isinfaction(Repository.giafac_AllowAnger)
-        ;     Debug.Notification(targetName + " did not like that.")
-        ;     ;target.UnsheatheWeapon()
-        ;     ;target.SendTrespassAlarm(caster) 
-        ;     target.StartCombat(caster)
-        ;     MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
-		; 	Endif
-        ; elseif aggro == "2"
-        ;     if actorRelationship != "4"
-        ;         Debug.Notification(targetName + " is willing to follow you.")
-        ;         ;gia target.setrelationshiprank(caster, 4)
-        ;         ;gia target.addtofaction(DunPlayerAllyFactionProperty)
-        ;         ;gia target.addtofaction(PotentialFollowerFactionProperty)
-        ;         if game.getplayer().isinfaction(repository.giafac_allowfollower)
-		; 			Debug.Notification(targetName + " is following you.");gia
-		; 			target.SetFactionRank(repository.giafac_following, 1);gia
-		; 			repository.gia_FollowerQst.reset();gia
-		; 			repository.gia_FollowerQst.stop();gia
-		; 			Utility.Wait(0.5);gia
-		; 			repository.gia_FollowerQst.start();gia
-		; 			target.EvaluatePackage();gia
-        ;         else
-        ;             Debug.Notification("Follow action not enabled in the Mantella MCM.")
-		; 		endif
-
-        ;         MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
-        ;     endIf
-        ; elseif aggro == "3"
-        ;     ; Cast MantellaEffect on player
-        ;     Debug.Notification("Casting MantellaEffect on player from " + targetName)
-        ;     Repository.MantellaSpell.cast(caster, game.getplayer())
-        ;     MiscUtil.WriteToFile("_mantella_aggro.txt", "",  append=false)
-        ; endIf
-
-        ; Update time (this may be too frequent)
         UpdateTime()
 
         caster.SetLookAt(target)
@@ -313,7 +270,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
             String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
             if radiantDialogue == "True"
                 float distanceBetweenActors = caster.GetDistance(target)
-                float distanceToPlayer = ConvertGameUnitsToMeter(caster.GetDistance(game.getplayer()))
+                float distanceToPlayer = ConvertGameUnitsToMeter(caster.GetDistance(PlayerRef))
                 ;Debug.Notification(distanceBetweenActors)
                 ;TODO: allow distanceBetweenActos limit to be customisable
                 if (distanceBetweenActors > 1500) || (distanceToPlayer > repository.radiantDistance) || (caster.GetCurrentLocation() != target.GetCurrentLocation()) || (caster.GetCurrentScene() != None) || (target.GetCurrentScene() != None)
@@ -368,8 +325,8 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         target.SheatheWeapon()
     elseIf methodName == "FollowPlayer"
         Debug.Notification(targetName + " is willing to follow you.")
-        if target.getrelationshiprank(game.getplayer()) < 4
-            target.SetRelationshipRank(game.getplayer(), 4)
+        if target.GetRelationshipRank(PlayerRef) < 4
+            target.SetRelationshipRank(PlayerRef, 4)
         endIf
         target.SetFactionRank(PlayerFaction, 1)
         target.SetFactionRank(PotentialFollowerFaction, 1)
@@ -392,7 +349,7 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
     elseIf methodName == "SetPlayerRelationshipRank"
         if args.Length == 1
             Debug.Notification("Setting relationship rank to " + args[0] + " for " + targetName)
-            target.SetRelationshipRank(game.getplayer(), args[0] as int)
+            target.SetRelationshipRank(PlayerRef, args[0] as int)
         else
             Debug.Notification("Invalid number of arguments for SetPlayerRelationshipRank")
             return false
@@ -428,7 +385,7 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         target.SendTrespassAlarm(caster)
     elseIf methodName == "SendTrespassAlarmPlayer"
         Debug.Notification(targetName + " is sending a trespass alarm for the player")
-        target.SendTrespassAlarm(game.getplayer())
+        target.SendTrespassAlarm(PlayerRef)
     elseIf methodName == "SendAssaultAlarmPlayer"
         Debug.Notification("Sending assault alarm for player")
         target.SendAssaultAlarm()
@@ -580,6 +537,8 @@ function GetPlayerInput()
     UIExtensions.OpenMenu("UITextEntryMenu")
 
     string result = UIExtensions.GetMenuResultString("UITextEntryMenu")
+    MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(PlayerRef, MantellaDialogueLine, result)
+    PlayerRef.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
 
     MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
     MiscUtil.WriteToFile("_mantella_text_input.txt", result, append=false)
