@@ -14,11 +14,11 @@ function LeftColumn(MantellaMCM mcm) global
     ;generates left column
     mcm.AddHeaderOption ("Target Info")
     
-    string currentActor = MiscUtil.ReadFromFile("_mantella_current_actor.txt") as string
+    string currentActor = MiscUtil.ReadFromFile("_pantella_current_actor.txt") as string
     ;check if there's actually an actor is selected (mostly there to prevent from displaying obsolete info from a previous target)
     if currentActor!=""
-        string currentActorID = MiscUtil.ReadFromFile("_mantella_current_actor_id.txt") as string
-        string currentActorSex = MiscUtil.ReadFromFile("_mantella_actor_sex.txt") as string
+        string currentActorID = MiscUtil.ReadFromFile("_pantella_current_actor_id.txt") as string
+        string currentActorSex = MiscUtil.ReadFromFile("_pantella_actor_sex.txt") as string
         ;below translate the number for gender into string text
         if currentActorSex == 1
             currentActorSex = "Female"
@@ -26,11 +26,11 @@ function LeftColumn(MantellaMCM mcm) global
             currentActorSex = "Male"
         endif
         ;this part below chops down the string from the text file to get the race
-        string currentActorRace = MiscUtil.ReadFromFile("_mantella_actor_race.txt") as string
+        string currentActorRace = MiscUtil.ReadFromFile("_pantella_actor_race.txt") as string
         string currentActorRaceSubstring= Substring(currentActorRace, 7)
         int currentActorRaceSpacePlacement = Find(currentActorRaceSubstring, "race ")
         currentActorRaceSubstring= Substring(currentActorRaceSubstring, 0, currentActorRaceSpacePlacement)
-        int currentActorRelationship = MiscUtil.ReadFromFile("_mantella_actor_relationship.txt") as int
+        int currentActorRelationship = MiscUtil.ReadFromFile("_pantella_actor_relationship.txt") as int
         ;build array for relationship status to transfert from number to string text 
         string[] relationshipArray = new string[9]
         relationshipArray[0]="Archnemesis"
@@ -44,11 +44,11 @@ function LeftColumn(MantellaMCM mcm) global
         relationshipArray[8]="Lover"
         string currentActorRelationshipString=relationshipArray[currentActorRelationship+4]
         ;this part below chops down the string from the text file  get the voice
-        string currentActorVoice = MiscUtil.ReadFromFile("_mantella_actor_voice.txt") as string
+        string currentActorVoice = MiscUtil.ReadFromFile("_pantella_actor_voice.txt") as string
         string currentActorVoiceSubstring= Substring(currentActorVoice, 12)
         int currentActorVoiceSpacePlacement = Find(currentActorVoiceSubstring, " ")
         currentActorVoiceSubstring= Substring(currentActorVoiceSubstring, 0, currentActorVoiceSpacePlacement)
-        string currentActorIsEnemy = MiscUtil.ReadFromFile("_mantella_actor_is_enemy.txt") as string
+        string currentActorIsEnemy = MiscUtil.ReadFromFile("_pantella_actor_is_enemy.txt") as string
         
         ;this part tells the MCM what to display
         mcm.AddTextOption("Name",currentActor )

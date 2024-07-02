@@ -67,6 +67,7 @@ bool property endFlagMantellaConversationAll auto
 
 string property context_string auto
 int property MantellaOpenContextMenuHotkey auto
+int property MantellaOpenIndividualContextMenuHotkey auto
 
 event OnInit()
     ;variables below used by MCM_PlayerTrackingSettings
@@ -118,6 +119,7 @@ event OnInit()
     MantellaEndHotkey = -1 ; Used to bind a hotkey to end the conversation - Unbound by default
     MantellaRadiantHotkey = -1 ; Used to bind a hotkey to enable/disable radiant dialogue - Unbound by default
     MantellaOpenContextMenuHotkey = -1 ; Used to bind a hotkey to open the context menu - Unbound by default
+    MantellaOpenIndividualContextMenuHotkey = -1 ; Used to bind a hotkey to open the individual context menu - Unbound by default
     
     BindPromptHotkey(MantellaOpenTextInputHotkey)
     BindAddToConversationHotkey(MantellaAddToConversationHotkey)
@@ -125,6 +127,7 @@ event OnInit()
     BindCustomGameEventHotkey(MantellaCustomGameEventHotkey)
     BindRadiantHotkey(MantellaRadiantHotkey)
     BindOpenContextMenuHotkey(MantellaOpenContextMenuHotkey)
+    MantellaOpenIndividualContextMenuHotkey = 49 ; The default key is the "C" key
 
     microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
@@ -173,13 +176,20 @@ function BindOpenContextMenuHotkey(int keyCode)
     RegisterForKey(keyCode)
 endfunction
 
+function BindOpenIndividualContextMenuHotkey(int keyCode)
+    ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
+    UnregisterForKey(MantellaOpenIndividualContextMenuHotkey)
+    MantellaOpenIndividualContextMenuHotkey=keyCode
+    RegisterForKey(keyCode)
+endfunction
+
 Event OnKeyDown(int KeyCode)
     ;this function was previously in MantellaListener Script back in Mantella 0.9.2
 	;this ensures the right key is pressed and only activated while not in menu mode
     if !utility.IsInMenuMode()
         if KeyCode == MantellaOpenTextInputHotkey
             String playerResponse = "False"
-            playerResponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
+            playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
             
             ; Debug.Notification("Getting Player Response: "+playerResponse)
             if playerResponse == "True" && !microphoneEnabled
@@ -188,13 +198,13 @@ Event OnKeyDown(int KeyCode)
                 UIExtensions.OpenMenu("UITextEntryMenu") ; Opens the text entry menu
                 string result = UIExtensions.GetMenuResultString("UITextEntryMenu") as String ; This is the text that the player entered into the menu
                 if result != ""
-                    MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
-                    MiscUtil.WriteToFile("_mantella_text_input.txt", result, append=false)
+                    MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+                    MiscUtil.WriteToFile("_pantella_text_input.txt", result, append=false)
                 endif
             endif
         elseif KeyCode == MantellaAddToConversationHotkey
-            String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
-            String activeActors = MiscUtil.ReadFromFile("_mantella_active_actors.txt") as String ; This is a list of all the actors that are currently loaded into the Mantella
+            String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
+            String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String ; This is a list of all the actors that are currently loaded into the Mantella
             Actor targetRef = (Game.GetCurrentCrosshairRef() as actor) ; this is the actor that the player is looking at when the hotkey is pressed - If the player is not looking at an actor, this will be None
             String actorName = targetRef.getdisplayname() ; Blank if the player is not looking at an actor
             ; Debug.Notification("Hotkey Pressed while looking at: "+actorName)
@@ -210,14 +220,14 @@ Event OnKeyDown(int KeyCode)
                 endif
             endif
         elseif KeyCode == MantellaEndHotkey
-            MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
-            MiscUtil.WriteToFile("_mantella_text_input.txt", "EndConversationNow", append=false)
+            MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+            MiscUtil.WriteToFile("_pantella_text_input.txt", "EndConversationNow", append=false)
         elseif KeyCode == MantellaCustomGameEventHotkey && !utility.IsInMenuMode() 
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.OpenMenu("UITextEntryMenu")
             string gameEventEntry = UIExtensions.GetMenuResultString("UITextEntryMenu")
             gameEventEntry = gameEventEntry+"\n"
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", gameEventEntry)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", gameEventEntry)
             endFlagMantellaConversationAll = false
         elseif KeyCode == MantellaRadiantHotkey
             radiantEnabled =! radiantEnabled
@@ -234,7 +244,22 @@ Event OnKeyDown(int KeyCode)
             UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
             string contextString = UIExtensions.GetMenuResultString("UITextEntryMenu")
             context_string = contextString
-            MiscUtil.WriteToFile("_mantella_context_string.txt", contextString, append=false)
+            MiscUtil.WriteToFile("_pantella_context_string.txt", contextString, append=false)
+        elseif KeyCode == MantellaOpenIndividualContextMenuHotkey
+            String playerResponse = "False"
+            playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
+            
+            ; Debug.Notification("Getting Player Response: "+playerResponse)
+            if playerResponse == "True"
+                Debug.Notification("Opening Context Menu with String: "+context_string)
+                UIExtensions.InitMenu("UITextEntryMenu")
+                UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
+                UIExtensions.OpenMenu("UITextEntryMenu")
+                UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
+                string contextString = UIExtensions.GetMenuResultString("UITextEntryMenu")
+                context_string = contextString
+                MiscUtil.WriteToFile("_pantella_individual_context_string.txt", contextString, append=false)
+            endif
         endif
     endif
 endEvent

@@ -14,7 +14,7 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
      ;This part of the MCM MainSettings script pretty much only serves to tell papyrus what button to display using properties from the repository
     ;generates left column
     mcm.AddHeaderOption ("Following NPC(s)")
-	mcm.oid_AllowForNPCtoFollowToggle=mcm.AddToggleOption("Enable Mantella followers", Repository.AllowForNPCtoFollow)
+	mcm.oid_AllowForNPCtoFollowToggle=mcm.AddToggleOption("Enable Pantella followers", Repository.AllowForNPCtoFollow)
 	;if game.getplayer().isinfaction(Repository.giafac_AllowFollower)
 	mcm.oid_followingNPCsitToggle=mcm.AddToggleOption("NPCs sit when player sits", Repository.followingNPCsit)
 	mcm.oid_followingNPCsleepToggle=mcm.AddToggleOption("NPCs sleep when player sleeps", Repository.followingNPCsleep)

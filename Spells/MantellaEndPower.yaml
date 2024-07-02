@@ -1,8 +1,8 @@
-FormKey: 02E113:Mantella.esp
-EditorID: MantellaEndPower
+FormKey: 02E113:Pantella.esp
+EditorID: PantellaEndPower
 Name:
   TargetLanguage: English
-  Value: Mantella End Conversation
+  Value: Pantella End Conversation
 MenuDisplayObject: 109AC3:Skyrim.esm
 EquipmentType: 013F44:Skyrim.esm
 Description:
@@ -11,5 +11,5 @@ Description:
 Type: LesserPower
 CastType: FireAndForget
 Effects:
-- BaseEffect: 011B10:Mantella.esp
+- BaseEffect: 011B10:Pantella.esp
   Data: {}

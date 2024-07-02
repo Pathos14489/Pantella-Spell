@@ -17,6 +17,7 @@ int property oid_microphoneEnabledToggle auto
 int property oid_debugNPCSelectMode auto
 int property oid_keymapRadiantHotkey auto
 int property oid_keymapOpenContextMenuHotkey auto
+int property oid_keymapOpenIndividualContextMenuHotkey auto
 
 int property oid_endFlagMantellaConversationAll auto
 
@@ -72,7 +73,7 @@ string MantellaMCMcurrentPage
 
 Event OnConfigInit()
 	;this part right here name all the pages we'll need (we can add more pages at the end as long as we update the numbers) and declares some variables
-    ModName = "Mantella"
+    ModName = "Pantella"
 	Pages = new string[4]
     Pages[0] = "Main settings"
 	Pages[1] = "Player tracking settings"
@@ -142,39 +143,41 @@ EndEvent
 Event OnOptionHighlight (Int optionID)
 	;tooltips for the Mantella Menu
 	If 	optionID ==oid_responsetimeslider
-		SetInfoText("This slider is used to set the timer (in seconds) to enter a text response when Mantella is ready to receive a text input (microphone disabled only)")
+		SetInfoText("This slider is used to set the timer (in seconds) to enter a text response when Pantella is ready to receive a text input (microphone disabled only)")
 	elseIf optionID ==oid_keymapPromptHotkey	
 		SetInfoText("This allows the player to start conversation with a hotkey. It can also be used to force the text prompt to appear during a conversation (microphone disabled only)")
 	elseIf optionID == oid_keymapEndHotkey
-		SetInfoText("Ends all Mantella conversations.")
+		SetInfoText("Ends all Pantella conversations.")
 	elseIf optionID ==oid_keymapCustomGameEventHotkey	
 		SetInfoText("This allows the player to enter a game event through text using the hotkey. For example, typing 'The house is on fire' will send that information to the AI")
 	elseIf optionID ==oid_microphoneEnabledToggle	
-		SetInfoText("This turn ON/OFF the microphone input for Mantella (requires Mantella.exe restart)")
+		SetInfoText("This turn ON/OFF the microphone input for Pantella (requires Pantella restart)")
 	elseIf optionID ==oid_debugNPCSelectMode	
 		SetInfoText("This allows the player to speak to any NPC by initiating a conversation then entering the actor RefID then the actor name that the player wishes to speak to")	
 	elseIf optionID ==oid_keymapRadiantHotkey
-		SetInfoText("This allows the player to toggle the Mantella Radiant effect on and off with a hotkey.")
+		SetInfoText("This allows the player to toggle the Pantella Radiant effect on and off with a hotkey.")
 	elseIf optionID ==oid_keymapOpenContextMenuHotkey
-		SetInfoText("This allows the player to open the Mantella context menu with a hotkey. This can be used to tell the LLM something that everyone will know until you change it. e.g. '[Player Name] is a vampire.' or '[Player Name] is traveling with Lydia, his loyal housecarl.' etc.")
+		SetInfoText("This allows the player to open the Pantella context menu with a hotkey. This can be used to tell the LLM something that everyone will know until you change it. e.g. '[Player Name] is a vampire.' or '[Player Name] is traveling with Lydia, his loyal housecarl.' etc.")
+	elseIf optionID ==oid_keymapOpenIndividualContextMenuHotkey
+		SetInfoText("This allows the player to open the Pantella context menu with a hotkey. This can be used to tell the LLM something that only the NPC will know until you change it. e.g. '[Player Name] is a vampire.' or '[Player Name] is traveling with Lydia, his loyal housecarl.' etc. Only works in One on One conversations between the player an an NPC.")
 	elseIf optionID ==oid_targetTrackingItemAddedToggle	
-		SetInfoText("This tracks if the Mantella Effect's target acquires an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target acquires an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingItemRemovedToggle	
-		SetInfoText("This tracks if the Mantella Effect's target drops an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target drops an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnSpellCastToggle	
-		SetInfoText("This tracks if the Mantella Effect's target casts a spell/shout while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target casts a spell/shout while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnHitToggle	
-		SetInfoText("This tracks if the Mantella Effect's target is hit by an attack while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target is hit by an attack while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnCombatStateChangedToggle	
-		SetInfoText("This tracks if the Mantella Effect's target changes combat state while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target changes combat state while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnObjectEquippedToggle	
-		SetInfoText("This tracks if the Mantella Effect's target equips an item/spell/shout while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target equips an item/spell/shout while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnObjectUnequippedToggle	
-		SetInfoText("This tracks if the Mantella Effect's target unequips an item/spell/shout an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target unequips an item/spell/shout an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnSitToggle	
-		SetInfoText("This tracks if the Mantella Effect's target sits down on a chair or work area an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target sits down on a chair or work area an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnGetUpToggle	
-		SetInfoText("This tracks if the Mantella Effect's target gets up from a chair or work area an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the Pantella Effect's target gets up from a chair or work area an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_targetTrackingOnGetUpToggle	
 		SetInfoText("Turns ON/OFF all tracking options for the target.")
 	elseif optionID ==oid_endFlagMantellaConversationAll
@@ -182,10 +185,10 @@ Event OnOptionHighlight (Int optionID)
 
 
 	elseIf optionID ==oid_AllowForNPCtoFollowToggle ;gia	
-		SetInfoText("Allow for NPCs to be Mantella followers.")
+		SetInfoText("Allow for NPCs to be Pantella followers.")
 
 	elseIf optionID ==oid_FollowingNPCsitToggle ;gia	
-		SetInfoText("Mantella followers sit when player sits.")
+		SetInfoText("Pantella followers sit when player sits.")
 	elseIf optionID ==oid_FollowingNPCsleepToggle ;gia	
 		SetInfoText("This must be enabled and the Player must be laying in bed to use dialogue to invite/uninvite followers to join them in a player owned bed. Does not pertain to rented beds. (player may have to exit the bed to uninvite or disable MCM toggle)")
 	elseIf optionID ==oid_NPCstopandTalkToggle ;gia	
@@ -199,33 +202,33 @@ Event OnOptionHighlight (Int optionID)
 
 		
 	elseIf optionID ==oid_playerTrackingOnItemAdded	
-		SetInfoText("This tracks if the player acquires an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if the player acquires an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnItemRemoved	
-		SetInfoText("This tracks if player drops an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if player drops an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnSpellCast	
-		SetInfoText("This tracks if player casts a spell/shout while the Mantella Spell is active.")
+		SetInfoText("This tracks if player casts a spell/shout while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnHit	
-		SetInfoText("This tracks if player is hit by an attack while the Mantella Spell is active.")
+		SetInfoText("This tracks if player is hit by an attack while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnLocationChange	
-		SetInfoText("This tracks if player changes location while the Mantella Spell is active.")
+		SetInfoText("This tracks if player changes location while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnObjectEquipped	
-		SetInfoText("This tracks if player equips an item/spell/shout while the Mantella Spell is active.")
+		SetInfoText("This tracks if player equips an item/spell/shout while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnObjectEquipped	
-		SetInfoText("This tracks if player unequips an item/spell/shout an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if player unequips an item/spell/shout an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnPlayerBowShot	
-		SetInfoText("This tracks if player shoots an arrow while the Mantella Spell is active")
+		SetInfoText("This tracks if player shoots an arrow while the Pantella Spell is active")
 	elseIf optionID ==oid_playerTrackingOnSit	
-		SetInfoText("This tracks if player sits down on a chair or work area an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if player sits down on a chair or work area an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnGetUp	
-		SetInfoText("This tracks if player gets up from a chair or work area an item while the Mantella Spell is active.")
+		SetInfoText("This tracks if player gets up from a chair or work area an item while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnVampireFeed
-		SetInfoText("This tracks if player feeds on a victim while the Mantella Spell is active.")
+		SetInfoText("This tracks if player feeds on a victim while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnFastTravelEnd
-		SetInfoText("This tracks if player ends a fast travel while the Mantella Spell is active.")
+		SetInfoText("This tracks if player ends a fast travel while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnVampirismStateChanged
-		SetInfoText("This tracks if player becomes a vampire or cures vampirism while the Mantella Spell is active.")
+		SetInfoText("This tracks if player becomes a vampire or cures vampirism while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingOnLycanthropyStateChanged
-		SetInfoText("This tracks if player becomes a werewolf or cures lycanthropy while the Mantella Spell is active.")
+		SetInfoText("This tracks if player becomes a werewolf or cures lycanthropy while the Pantella Spell is active.")
 	elseIf optionID ==oid_playerTrackingAll	
 		SetInfoText("Turns ON/OFF all tracking options for the player.")
 	EndIf

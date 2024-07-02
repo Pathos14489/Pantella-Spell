@@ -1,8 +1,8 @@
-FormKey: 000805:Mantella.esp
-EditorID: MantellaPower
+FormKey: 000805:Pantella.esp
+EditorID: PantellaPower
 Name:
   TargetLanguage: English
-  Value: Mantella
+  Value: Pantella
 MenuDisplayObject: 10A046:Skyrim.esm
 EquipmentType: 025BEE:Skyrim.esm
 Description:
@@ -12,6 +12,6 @@ Type: LesserPower
 CastType: FireAndForget
 TargetType: TargetActor
 Effects:
-- BaseEffect: 0022EE:Mantella.esp
+- BaseEffect: 0022EE:Pantella.esp
   Data:
     Magnitude: 999

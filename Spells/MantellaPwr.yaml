@@ -1,8 +1,8 @@
-FormKey: 000805:Mantella.esp
-EditorID: MantellaPwr
+FormKey: 000805:Pantella.esp
+EditorID: PantellaPwr
 Name:
   TargetLanguage: English
-  Value: Mantella Power
+  Value: Pantella Power
 MenuDisplayObject: 10A046:Skyrim.esm
 EquipmentType: 025BEE:Skyrim.esm
 Description:

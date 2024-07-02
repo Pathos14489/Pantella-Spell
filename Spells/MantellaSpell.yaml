@@ -1,8 +1,8 @@
-FormKey: 0022EF:Mantella.esp
-EditorID: MantellaSpell
+FormKey: 0022EF:Pantella.esp
+EditorID: PantellaSpell
 Name:
   TargetLanguage: English
-  Value: Mantella
+  Value: Pantella
 MenuDisplayObject: 10A046:Skyrim.esm
 EquipmentType: 013F44:Skyrim.esm
 Description:
@@ -11,5 +11,5 @@ Description:
 CastType: FireAndForget
 TargetType: TargetActor
 Effects:
-- BaseEffect: 0022EE:Mantella.esp
+- BaseEffect: 0022EE:Pantella.esp
   Data: {}

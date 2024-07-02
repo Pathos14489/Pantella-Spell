@@ -17,6 +17,7 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
     mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
     mcm.oid_keymapOpenContextMenuHotkey = mcm.AddKeyMapOption("Open Context Menu", repository.MantellaOpenContextMenuHotkey)
+    mcm.oid_keymapOpenIndividualContextMenuHotkey = mcm.AddKeyMapOption("Open Individual Context Menu", repository.MantellaOpenIndividualContextMenuHotkey)
 
     
     mcm.AddHeaderOption("Settings")
@@ -78,7 +79,7 @@ endfunction
 
 function KeyMapChange(MantellaMCM mcm,Int option, Int keyCode, String conflictControl, String conflictName, MantellaRepository Repository) global
     ;This script is used to check if a key is already used, if it's not it will update to a new value (stored in MantellaRepository) or it will prompt the user to warn him of the conflict. The actual keybind happens in MantellaRepository
-    if option == mcm.oid_keymapPromptHotkey || mcm.oid_keymapCustomGameEventHotkey || mcm.oid_keymapEndHotkey || mcm.oid_keymapRadiantHotkey || mcm.oid_keymapMantellaAddToConversationHotkey || mcm.oid_keymapOpenContextMenuHotkey
+    if option == mcm.oid_keymapPromptHotkey || mcm.oid_keymapCustomGameEventHotkey || mcm.oid_keymapEndHotkey || mcm.oid_keymapRadiantHotkey || mcm.oid_keymapMantellaAddToConversationHotkey || mcm.oid_keymapOpenContextMenuHotkey || mcm.oid_keymapOpenIndividualContextMenuHotkey
         Bool continue = true
         ;below checks if there's already a bound key
         if conflictControl != ""
@@ -105,6 +106,8 @@ function KeyMapChange(MantellaMCM mcm,Int option, Int keyCode, String conflictCo
                 repository.BindAddToConversationHotkey(keyCode)
             elseif option == mcm.oid_keymapOpenContextMenuHotkey
                 repository.BindOpenContextMenuHotkey(keyCode)
+            elseif option == mcm.oid_keymapOpenIndividualContextMenuHotkey
+                repository.BindOpenIndividualContextMenuHotkey(keyCode)
             endif
         endIf
     endIf
@@ -115,8 +118,8 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
     if optionID == mcm.oid_microphoneEnabledToggle
         Repository.microphoneEnabled =! Repository.microphoneEnabled
         mcm.SetToggleOptionValue(mcm.oid_microphoneEnabledToggle, Repository.microphoneEnabled)
-        MiscUtil.WriteToFile("_mantella_microphone_enabled.txt", Repository.microphoneEnabled,  append=false)
-        debug.MessageBox("Please restart Mantella and start a new conversation for this option to take effect")
+        MiscUtil.WriteToFile("_pantella_microphone_enabled.txt", Repository.microphoneEnabled,  append=false)
+        debug.MessageBox("Please restart Pantella and start a new conversation for this option to take effect")
     elseIf optionID == mcm.oid_debugNPCselectMode
         Repository.NPCdebugSelectModeEnabled =! Repository.NPCdebugSelectModeEnabled
         mcm.SetToggleOptionValue(mcm.oid_debugNPCselectMode, Repository.NPCdebugSelectModeEnabled)
@@ -147,14 +150,14 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
 endfunction
 
 function EndAllConversations(MantellaMCM mcm,MantellaRepository Repository) global ; Ends all conversations with popups notifying the user
-    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
     Utility.wait(0.5)
     repository.endFlagMantellaConversationAll = false
     mcm.SetToggleOptionValue(mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
-    debug.messagebox("All ongoing conversations terminated. Restart Mantella.exe. The next conversation might need to be started twice.")
+    debug.messagebox("All ongoing conversations terminated. Restart Pantella. The next conversation might need to be started twice.")
 Endfunction
 function ForceEndAllConversations(MantellaRepository Repository) global ; Quietly ends all conversations
-    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
     Utility.wait(0.5)
     repository.endFlagMantellaConversationAll = false
 Endfunction

@@ -29,18 +29,22 @@ event OnEffectStart(Actor target, Actor caster)
         playerGender = "Female"
     endIf
     String playerName = PlayerRef.GetActorBase().GetName()
-    MiscUtil.WriteToFile("_mantella_player_name.txt", playerName, append=false)
-    MiscUtil.WriteToFile("_mantella_player_race.txt", playerRace, append=false)
-    MiscUtil.WriteToFile("_mantella_player_gender.txt", playerGender, append=false)
+    MiscUtil.WriteToFile("_pantella_player_name.txt", playerName, append=false)
+    MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)
+    MiscUtil.WriteToFile("_pantella_player_gender.txt", playerGender, append=false)
+    String playerIsArrested = PlayerRef.IsArrested()
+    MiscUtil.WriteToFile("_pantella_player_is_arrested.txt", playerIsArrested, append=false)
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
     
-    MiscUtil.WriteToFile("_mantella_skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in MantellaSoftware/config.ini", append=false)
+    MiscUtil.WriteToFile("_pantella_skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in PantellaSoftware/config.json", append=false)
 	; only run script if actor is not already selected
-	; String currentActor = MiscUtil.ReadFromFile("_mantella_current_actor.txt") as String
+	; String currentActor = MiscUtil.ReadFromFile("_pantella_current_actor.txt") as String
 
-    String activeActors = MiscUtil.ReadFromFile("_mantella_active_actors.txt") as String ;get list of active actors from _mantella_active_actors.txt from Python
-    int actorCount = MiscUtil.ReadFromFile("_mantella_actor_count.txt") as int ;get number of actors from _mantella_actor_count.txt from Python
+    String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String ;get list of active actors from _pantella_active_actors.txt from Python
+    int actorCount = MiscUtil.ReadFromFile("_pantella_actor_count.txt") as int ;get number of actors from _pantella_actor_count.txt from Python
     actorCount += 1 ; increment actorCount by 1 to account for the actor that was just added to a conversation
-    String character_selection_enabled = MiscUtil.ReadFromFile("_mantella_character_selection.txt") as String
+    String character_selection_enabled = MiscUtil.ReadFromFile("_pantella_character_selection.txt") as String
 
     Utility.Wait(0.5)
 
@@ -64,17 +68,18 @@ event OnEffectStart(Actor target, Actor caster)
         actorAlreadyLoaded = false
     endIf
 
-    String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
+    String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
     Bool isCasterPlayer = (caster == PlayerRef)
     Debug.Notification("isCasterPlayer: " + isCasterPlayer as String)
     
     if radiantDialogue == "True" && isCasterPlayer && actorAlreadyLoaded == false ; if radiant dialogue is active without the actor selected by player, end the ongoing radiant conversation
         Debug.Notification("Ending radiant dialogue")
-        MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+        MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
     elseIf radiantDialogue == "True" && actorAlreadyLoaded == true && isCasterPlayer ; if selected actor is in radiant dialogue, disable this mode to allow the player to join the conversation 
         Debug.Notification("Adding player to conversation")
-        MiscUtil.WriteToFile("_mantella_radiant_dialogue.txt", "False",  append=false)
+        MiscUtil.WriteToFile("_pantella_radiant_dialogue.txt", "False",  append=false)
 	elseIf actorAlreadyLoaded == false && character_selection_enabled == "True" ; if actor not already loaded and character selection is enabled
+        Debug.Notification("Attempting to add NPC to conversation...")
         TargetRefAlias.ForceRefTo(target)
         
         
@@ -90,82 +95,124 @@ event OnEffectStart(Actor target, Actor caster)
 			UIExtensions.InitMenu("UITextEntryMenu")
 			UIExtensions.OpenMenu("UITextEntryMenu")
 			string result1 = UIExtensions.GetMenuResultString("UITextEntryMenu")
-			MiscUtil.WriteToFile("_mantella_current_actor_ref_id.txt", result1, append=false)
+			MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", result1, append=false)
 		else ; if debug select mode is not active, use the actor's RefID as the ID to have a conversation with
-		    MiscUtil.WriteToFile("_mantella_current_actor_ref_id.txt", actorRefId, append=false)
+		    MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", actorRefId, append=false)
 		endIf
-        MiscUtil.WriteToFile("_mantella_current_actor_base_id.txt", actorBaseId, append=false)
+        MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", actorBaseId, append=false)
 
 
-        ; Get NPC's name and save name to _mantella_current_actor.txt for Python to read
+        ; Get NPC's name and save name to _pantella_current_actor.txt for Python to read
 		if repository.NPCdebugSelectModeEnabled==true ;if debug select mode is active this will allow the user to enter in the RefID of the NPC bio/voice to have a conversation with
             Debug.Messagebox("Enter the name of the actor that you wish to speak to")
             Utility.Wait(0.1)
 			UIExtensions.InitMenu("UITextEntryMenu")
 			UIExtensions.OpenMenu("UITextEntryMenu")
 			string result2 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;get actor name from user input
-			MiscUtil.WriteToFile("_mantella_current_actor.txt", result2, append=false) ;save actor name to _mantella_current_actor.txt for Python to read
-            MiscUtil.WriteToFile("_mantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _mantella_active_actors.txt for Python to read
-            MiscUtil.WriteToFile("_mantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
+			MiscUtil.WriteToFile("_pantella_current_actor.txt", result2, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 		else ;if debug select mode is not active, use the actor's name as the name to have a conversation with
-			MiscUtil.WriteToFile("_mantella_current_actor.txt", targetName, append=false) ;save actor name to _mantella_current_actor.txt for Python to read
-            MiscUtil.WriteToFile("_mantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _mantella_active_actors.txt for Python to read
-            MiscUtil.WriteToFile("_mantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
+			MiscUtil.WriteToFile("_pantella_current_actor.txt", targetName, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 		endIf
 
 		target.addtofaction(repository.giafac_Mantella);gia 
 		
         String actorSex = target.GetLeveledActorBase().GetSex()
-        MiscUtil.WriteToFile("_mantella_actor_sex.txt", actorSex, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_sex.txt", actorSex, append=false)
 
         String actorRace = target.GetRace()
-        MiscUtil.WriteToFile("_mantella_actor_race.txt", actorRace, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_race.txt", actorRace, append=false)
+
+        String actorIsGuard = target.IsGuard()
+        MiscUtil.WriteToFile("_pantella_actor_is_guard.txt", actorIsGuard, append=false)
+
+        String actorIsGhost = target.IsGhost()
+        MiscUtil.WriteToFile("_pantella_actor_is_ghost.txt", actorIsGhost, append=false)
+
+        String actorIsTrespassing = target.IsTrespassing()
+        MiscUtil.WriteToFile("_pantella_actor_is_trespassing.txt", actorIsTrespassing, append=false)
+
+        String actorIsInCombat = target.IsInCombat()
+        MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", actorIsInCombat, append=false)
+
+        String actorIsUnconscious = target.IsUnconscious()
+        MiscUtil.WriteToFile("_pantella_actor_is_unconscious.txt", actorIsUnconscious, append=false)
+
+        String actorIsIntimidated = target.IsIntimidated()
+        MiscUtil.WriteToFile("_pantella_actor_is_intimidated.txt", actorIsIntimidated, append=false)
+        
+        String actorHasWeaponDrawn = target.IsWeaponDrawn()
+        MiscUtil.WriteToFile("_pantella_actor_has_weapon_drawn.txt", actorHasWeaponDrawn, append=false)
+
+        String actorIsPlayerTeammate = target.IsPlayerTeammate()
+        MiscUtil.WriteToFile("_pantella_actor_is_player_teammate.txt", actorIsPlayerTeammate, append=false)
+
+        ; String actorIsRidingHorse = target.IsRidingHorse()
+        ; MiscUtil.WriteToFile("_pantella_actor_is_riding_horse.txt", actorIsRidingHorse, append=false)
+
+        String actorDetectsPlayer = PlayerRef.IsDetectedBy(target)
+        MiscUtil.WriteToFile("_pantella_actor_detects_player.txt", actorDetectsPlayer, append=false)
+
+        String actorIsBribed = target.IsBribed()
+        MiscUtil.WriteToFile("_pantella_actor_is_bribed.txt", actorIsBribed, append=false)
+
+        String actorIsArrested = target.IsArrested()
+        MiscUtil.WriteToFile("_pantella_actor_is_arrested.txt", actorIsArrested, append=false)
+
+        String actorIsArrestingSomeone = target.IsArrestingTarget()
+        MiscUtil.WriteToFile("_pantella_actor_is_arresting_someone.txt", actorIsArrestingSomeone, append=false)
+
+        String actorLightLevel = target.GetLightLevel()
+        MiscUtil.WriteToFile("_pantella_actor_light_level.txt", actorLightLevel, append=false)
 
         String actorRelationship = target.GetRelationshipRank(PlayerRef)
-        MiscUtil.WriteToFile("_mantella_actor_relationship.txt", actorRelationship, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_relationship.txt", actorRelationship, append=false)
 
         String actorVoiceType = target.GetVoiceType()
-        MiscUtil.WriteToFile("_mantella_actor_voice.txt", actorVoiceType, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_voice.txt", actorVoiceType, append=false)
 
         String isEnemy = "False"
         if (target.GetCombatTarget() == PlayerRef)
             isEnemy = "True"
         endIf
-        MiscUtil.WriteToFile("_mantella_actor_is_enemy.txt", isEnemy, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_is_enemy.txt", isEnemy, append=false)
         
         String currLoc = (caster.GetCurrentLocation() as form).getname()
         if currLoc == ""
             currLoc = "Skyrim"
         endIf
-        MiscUtil.WriteToFile("_mantella_current_location.txt", currLoc, append=false)
+        MiscUtil.WriteToFile("_pantella_current_location.txt", currLoc, append=false)
 
         UpdateTime() ; update time to be used for the time of day in the conversation
 
-        MiscUtil.WriteToFile("_mantella_actor_count.txt", actorCount, append=false)
+        MiscUtil.WriteToFile("_pantella_actor_count.txt", actorCount, append=false)
 
         if actorCount == 1 ; reset player input if this is the first actor selected
-            MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
-            MiscUtil.WriteToFile("_mantella_text_input.txt", "", append=false)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", "", append=False)
+            MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+            MiscUtil.WriteToFile("_pantella_text_input.txt", "", append=false)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", "", append=False)
         endif
 
         if isCasterPlayer && actorCount == 1
             Debug.Notification(casterName + " is starting conversation with " + targetName)
-        elseIf isCasterPlayer && actorCount >1
-                Debug.Notification("Adding " + targetName + " to conversation")
+        elseIf isCasterPlayer && actorCount > 1
+            Debug.Notification("Adding " + targetName + " to conversation")
         elseIf actorCount == 1
             Debug.Notification("Starting radiant dialogue with " + targetName + " and " + casterName)
         endIf
 
         String endConversation = "False"
         String sayFinalLine = "False"
-        String sayLineFile = "_mantella_say_line_"+actorCount+".txt"
+        String sayLineFile = "_pantella_say_line_"+actorCount+".txt"
         Int loopCount = 0
 
         ; Wait for first voiceline to play to avoid old conversation playing
         Utility.Wait(0.5)
 
-        MiscUtil.WriteToFile("_mantella_character_selected.txt", "True", append=false)
+        MiscUtil.WriteToFile("_pantella_character_selected.txt", "True", append=false)
 
         ; Start conversation loop - this will run over and over until the conversation is ended
         While endConversation == "False" && repository.endFlagMantellaConversationAll==false
@@ -182,13 +229,13 @@ event OnEffectStart(Actor target, Actor caster)
             endIf
 
             ; Wait for Python / the script to give the green light to end the conversation
-            sayFinalLine = MiscUtil.ReadFromFile("_mantella_end_conversation.txt") as String
+            sayFinalLine = MiscUtil.ReadFromFile("_pantella_end_conversation.txt") as String
         endWhile
 
 
         Debug.Notification("Conversation ended.")
 		target.removefromfaction(repository.giafac_Mantella);gia
-        radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
+        radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
         if radiantDialogue == "True"
             Debug.Notification("Radiant dialogue ended.")
         else
@@ -196,7 +243,7 @@ event OnEffectStart(Actor target, Actor caster)
         endIf
         target.ClearLookAt()
         caster.ClearLookAt()
-        MiscUtil.WriteToFile("_mantella_actor_count.txt", "0", append=False)
+        MiscUtil.WriteToFile("_pantella_actor_count.txt", "0", append=False)
     else
         Debug.Notification("NPC not added. Please try again after your next response.")
     endIf
@@ -205,7 +252,9 @@ endEvent
 
 function MainConversationLoop(Actor target, Actor caster, String targetName, String casterName, String actorRelationship, Int loopCount) ; this function is for the first actor selected in a conversation
     ; Debug.Notification("MainConversationLoop")
-    String sayLine = MiscUtil.ReadFromFile("_mantella_say_line.txt") as String
+    String sayLine = MiscUtil.ReadFromFile("_pantella_say_line.txt") as String
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
     if sayLine != "False" ; if there is a line to say
         Debug.Notification(targetName + " is speaking.")
         MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
@@ -213,13 +262,13 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
         target.SetLookAt(caster)
 
         ; Set sayLine back to False once the voiceline has been triggered
-        MiscUtil.WriteToFile("_mantella_say_line.txt", "False",  append=false)
+        MiscUtil.WriteToFile("_pantella_say_line.txt", "False",  append=false)
         localMenuTimer = -1
 ; 
         ; Debug.Notification("Checking for actor methods")
 
-        ; Check every line of _mantella_actor_methods for the following format: "refID|methodName|args" with the args section being optional, and "<>" separated. Every line that matches this format will be removed and the file updated
-        String actorMethods = MiscUtil.ReadFromFile("_mantella_actor_methods.txt") as String
+        ; Check every line of _pantella_actor_methods for the following format: "refID|methodName|args" with the args section being optional, and "<>" separated. Every line that matches this format will be removed and the file updated
+        String actorMethods = MiscUtil.ReadFromFile("_pantella_actor_methods.txt") as String
         String newActorMethods = ""
         if actorMethods != "" && actorMethods != "False" ; if the file is not empty or False
             ; Debug.Notification("Found actor" + actorMethodsArray.Length as String + " methods.")
@@ -242,7 +291,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
                 endIf
                 i += 1
             endwhile
-            MiscUtil.WriteToFile("_mantella_actor_methods.txt", newActorMethods,  append=false)
+            MiscUtil.WriteToFile("_pantella_actor_methods.txt", newActorMethods,  append=false)
         endIf
         
         UpdateTime()
@@ -252,13 +301,13 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
 
     ; Run these checks every 5 loops
     if loopCount % 5 == 0
-        String status = MiscUtil.ReadFromFile("_mantella_status.txt") as String
+        String status = MiscUtil.ReadFromFile("_pantella_status.txt") as String
         if status != "False"
             Debug.Notification(status)
-            MiscUtil.WriteToFile("_mantella_status.txt", "False",  append=false)
+            MiscUtil.WriteToFile("_pantella_status.txt", "False",  append=false)
         endIf
 
-        String playerResponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
+        String playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String
         if playerResponse == "True"
             StartTimer()
             Utility.Wait(2)
@@ -267,7 +316,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
         if loopCount % 20 == 0
             target.ClearLookAt()
             caster.ClearLookAt()
-            String radiantDialogue = MiscUtil.ReadFromFile("_mantella_radiant_dialogue.txt") as String
+            String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
             if radiantDialogue == "True"
                 float distanceBetweenActors = caster.GetDistance(target)
                 float distanceToPlayer = ConvertGameUnitsToMeter(caster.GetDistance(PlayerRef))
@@ -275,7 +324,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
                 ;TODO: allow distanceBetweenActos limit to be customisable
                 if (distanceBetweenActors > 1500) || (distanceToPlayer > repository.radiantDistance) || (caster.GetCurrentLocation() != target.GetCurrentLocation()) || (caster.GetCurrentScene() != None) || (target.GetCurrentScene() != None)
                     ;Debug.Notification(distanceBetweenActors)
-                    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+                    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
                 endIf
             endIf
         endIf
@@ -285,6 +334,8 @@ endFunction
 function ConversationLoop(Actor target, Actor caster, String targetName, String casterName, String sayLineFile) ; this function is for all actors selected after the first actor in a conversation
     ; Debug.Notification("ConversationLoop")
     String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
     if sayLine != "False"
         Debug.Notification(targetName + " is speaking.")
         ; Debug.Notification(sayLine)
@@ -396,6 +447,30 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             crime_fac.ModCrimeGold(100, true)
         endIf
         target.SendAssaultAlarm()
+    elseIf methodName == "ModNonViolentCrime"
+        Debug.Notification("Modifying non-violent crime")
+        Faction crime_fac = target.GetCrimeFaction()
+        if args.Length == 1
+            Int crimeGold = args[0] as int
+            if crime_fac != None
+                crime_fac.ModCrimeGold(crimeGold, false)
+            endIf
+        else
+            Debug.Notification("Invalid number of arguments for ModNonViolentCrime")
+            return false
+        endIf
+    elseIf methodName == "ModViolentCrime"
+        Debug.Notification("Modifying violent crime")
+        Faction crime_fac = target.GetCrimeFaction()
+        if args.Length == 1
+            Int crimeGold = args[0] as int
+            if crime_fac != None
+                crime_fac.ModCrimeGold(crimeGold, true)
+            endIf
+        else
+            Debug.Notification("Invalid number of arguments for ModViolentCrime")
+            return false
+        endIf
     elseIf methodName == "PlayerResistingArrest"
         Debug.Notification("Player is resisting arrest")
         target.SetPlayerResistingArrest()
@@ -430,6 +505,12 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
     elseIf methodName == "Kill"
         Debug.Notification("Killing " + targetName)
         target.Kill()
+    elseIf methodName == "EnableAI"
+        Debug.Notification("Enabling AI for " + targetName)
+        target.EnableAI(true)
+    elseIf methodName == "DisableAI"
+        Debug.Notification("Disabling AI for " + targetName)
+        target.EnableAI(false)
     elseIf methodName == "TakeEverythingOff"
         Debug.Notification("Taking everything off " + targetName)
         target.UnequipAll()
@@ -477,7 +558,7 @@ endfunction
 
 function UpdateTime()
 	string Time = Utility.GameTimeToString(Utility.GetCurrentGameTime()) ; Example: 07/12/0713 10:31 - Will be parsed in Python
-    MiscUtil.WriteToFile("_mantella_in_game_time.txt", Time, append=false)
+    MiscUtil.WriteToFile("_pantella_in_game_time.txt", Time, append=false)
 endFunction
 
 function SplitSubtitleIntoParts(String subtitle)
@@ -501,12 +582,12 @@ function StartTimer()
 	;Debug.Notification("Timer is "+localMenuTimer)
 	While localMenuTimer >= 0 && repository.endFlagMantellaConversationAll==false
 		; Debug.Notification("Timer is "+localMenuTimer)
-		Monitorplayerresponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
-		timerCheckEndConversation = MiscUtil.ReadFromFile("_mantella_end_conversation.txt") as String
+		Monitorplayerresponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String
+		timerCheckEndConversation = MiscUtil.ReadFromFile("_pantella_end_conversation.txt") as String
 		;the next if clause checks if another conversation is already running and ends it.
 		if timerCheckEndConversation || "true" || repository.endFlagMantellaConversationAll==true
 			localMenuTimer = -1
-			MiscUtil.WriteToFile("_mantella_say_line.txt", "False", append=false)
+			MiscUtil.WriteToFile("_pantella_say_line.txt", "False", append=false)
 			return
 		endif
 		if Monitorplayerresponse == "False"
@@ -522,7 +603,7 @@ function StartTimer()
             ; Debug.Notification("Timer is "+localMenuTimer)
 			Monitorplayerresponse = "False"
 			;added this as a safety check in case the player stays in a menu a long time.
-			Monitorplayerresponse = MiscUtil.ReadFromFile("_mantella_text_input_enabled.txt") as String
+			Monitorplayerresponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String
 			if Monitorplayerresponse == "True"
 				;Debug.Notification("opening menu now")
 				GetPlayerInput()
@@ -540,8 +621,8 @@ function GetPlayerInput()
     MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(PlayerRef, MantellaDialogueLine, result)
     PlayerRef.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
 
-    MiscUtil.WriteToFile("_mantella_text_input_enabled.txt", "False", append=False)
-    MiscUtil.WriteToFile("_mantella_text_input.txt", result, append=false)
+    MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+    MiscUtil.WriteToFile("_pantella_text_input.txt", result, append=false)
 endFunction
 
 Float meterUnits = 71.0210

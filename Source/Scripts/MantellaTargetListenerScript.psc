@@ -16,7 +16,7 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
         
         if (itemName != "Iron Arrow") && (itemName != "") ;Papyrus hallucinates iron arrows
             ;Debug.Notification(itemPickedUpMessage)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", itemPickedUpMessage)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemPickedUpMessage)
         endIf
     endif
 EndEvent
@@ -35,7 +35,7 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
         
         if  (itemName != "Iron Arrow") && (itemName != "") ; Papyrus hallucinates iron arrows
             ;Debug.Notification(itemDroppedMessage)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", itemDroppedMessage)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemDroppedMessage)
         endIf
     endif
 endEvent
@@ -47,7 +47,7 @@ Event OnSpellCast(Form akSpell)
         string spellCast = (akSpell as form).getname()
         if spellCast 
             ;Debug.Notification(selfName+" casted the spell "+ spellCast)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" casted the spell " + spellCast + ".\n")
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" casted the spell " + spellCast + ".\n")
         endIf
     endif
 endEvent
@@ -76,12 +76,12 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 
             if (hitSource == "None") || (hitSource == "")
                 ;Debug.MessageBox(aggressor + " punched "+selfName+".")
-                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " punched "+selfName+".\n")
-            elseif hitSource == "Mantella"
-                ; Do not save event if Mantella itself is cast
+                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " punched "+selfName+".\n")
+            elseif hitSource == "Pantella"
+                ; Do not save event if Pantella itself is cast
             else
                 ;Debug.MessageBox(aggressor + " hit "+selfName+" with a(n) " + hitSource)
-                MiscUtil.WriteToFile("_mantella_in_game_events.txt", aggressor + " hit "+selfName+" with " + hitSource+".\n")
+                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " hit "+selfName+" with " + hitSource+".\n")
             endIf
         else
             timesHitSameAggressorSource += 1
@@ -102,15 +102,15 @@ Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
 
         if (aeCombatState == 0)
             ;Debug.MessageBox(selfName+" is no longer in combat")
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" is no longer in combat.\n")
-            MiscUtil.WriteToFile("_mantella_actor_is_in_combat.txt", "False", append=false)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" is no longer in combat.\n")
+            MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", "False", append=false)
         elseif (aeCombatState == 1)
             ;Debug.MessageBox(selfName+" has entered combat with "+targetName)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" has entered combat with "+targetName+".\n")
-            MiscUtil.WriteToFile("_mantella_actor_is_in_combat.txt", "True", append=false)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" has entered combat with "+targetName+".\n")
+            MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", "True", append=false)
         elseif (aeCombatState == 2)
             ;Debug.MessageBox(selfName+" is searching for "+targetName)
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" is searching for "+targetName+".\n")
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" is searching for "+targetName+".\n")
         endIf
     endif
 endEvent
@@ -121,7 +121,7 @@ Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
         String selfName = self.GetActorReference().getdisplayname()
         string itemEquipped = akBaseObject.getname()
         ;Debug.MessageBox(selfName+" equipped " + itemEquipped)
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" equipped " + itemEquipped + ".\n")
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" equipped " + itemEquipped + ".\n")
     endif
 endEvent
 
@@ -131,7 +131,7 @@ Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
         String selfName = self.GetActorReference().getdisplayname()
         string itemUnequipped = akBaseObject.getname()
         ;Debug.MessageBox(selfName+" unequipped " + itemUnequipped)
-        MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" unequipped " + itemUnequipped + ".\n")
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" unequipped " + itemUnequipped + ".\n")
     endif
 endEvent
 
@@ -143,7 +143,7 @@ Event OnSit(ObjectReference akFurniture)
         String furnitureName = akFurniture.getbaseobject().getname()
         ; only save event if actor is sitting / resting on furniture (and not just, for example, leaning on a bar table)
         if furnitureName != ""
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" rested on / used a(n) "+furnitureName+".\n")
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" rested on / used a(n) "+furnitureName+".\n")
         endIf
     endif
 endEvent
@@ -156,12 +156,12 @@ Event OnGetUp(ObjectReference akFurniture)
         String furnitureName = akFurniture.getbaseobject().getname()
         ; only save event if actor is sitting / resting on furniture (and not just, for example, leaning on a bar table)
         if furnitureName != ""
-            MiscUtil.WriteToFile("_mantella_in_game_events.txt", selfName+" stood up from a(n) "+furnitureName+".\n")
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" stood up from a(n) "+furnitureName+".\n")
         endIf
     endif
 EndEvent
 
 
 Event OnDying(Actor akKiller)
-    MiscUtil.WriteToFile("_mantella_end_conversation.txt", "True",  append=false)
+    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
 EndEvent
