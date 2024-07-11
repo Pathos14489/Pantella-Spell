@@ -45,6 +45,22 @@ Event OnPlayerLoadGame()
     Debug.Notification("Pantella loaded - player is " + playerName + ", a " + playerGender + " " + playerRace + ".")
 EndEvent
 
+event OnRaceSwitchComplete()
+    Actor player = Game.GetPlayer()
+    String playerRace = player.GetRace().GetName()
+    Int playerGenderID = player.GetActorBase().GetSex()
+    String playerGender = ""
+    if (playerGenderID == 0)
+        playerGender = "Male"
+    else
+        playerGender = "Female"
+    endIf
+    String playerName = player.GetActorBase().GetName()
+    MiscUtil.WriteToFile("_pantella_player_name.txt", playerName, append=false)
+    MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)
+    MiscUtil.WriteToFile("_pantella_player_gender.txt", playerGender, append=false)
+EndEvent
+
 event OnUpdate()
     if repository.radiantEnabled
         String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String
@@ -113,14 +129,14 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
         String playerName = player.GetActorBase().GetName()
         
         string itemName = akBaseItem.GetName()
-        string itemPickedUpMessage = playerName + " picked up " + itemName + ".\n"
-
-        string sourceName = akSourceContainer.getbaseobject().getname()
-        if sourceName != ""
-            itemPickedUpMessage = playerName + " picked up " + itemName + " from " + sourceName + ".\n"
-        endIf
-        
-        if itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
+        if itemName != "" && itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
+            string itemPickedUpMessage = playerName + " picked up " + itemName + ".\n"
+            itemPickedUpMessage = "player<OnItemAdded>item_name=" + itemName + "\n"
+            string sourceName = akSourceContainer.getbaseobject().getname()
+            if sourceName != ""
+                itemPickedUpMessage = "player<OnItemAddedFromDestination>item_name=" + itemName + "|source_name=" + sourceName + "\n"
+            endIf
+            
             ;Debug.MessageBox(itemPickedUpMessage)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemPickedUpMessage)
         endIf
@@ -133,14 +149,14 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
         String playerName = player.GetActorBase().GetName()
 
         string itemName = akBaseItem.GetName()
-        string itemDroppedMessage = playerName + " dropped " + itemName + ".\n"
+        if itemName != "" || itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
+            string itemDroppedMessage = "player<OnItemRemoved>item_name=" + itemName + "\n"
 
-        string destName = akDestContainer.getbaseobject().getname()
-        if destName != ""
-            itemDroppedMessage = playerName + " placed " + itemName + " in/on " + destName + ".\n"
-        endIf
-        
-        if itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
+            string destName = akDestContainer.getbaseobject().getname()
+            if destName != ""
+                itemDroppedMessage = "player<OnItemRemovedToDestination>item_name=" + itemName + "|source_name=" + destName + "\n"
+            endIf
+            
             ;Debug.MessageBox(itemDroppedMessage)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemDroppedMessage)
         endIf
@@ -149,16 +165,14 @@ endEvent
 
 Event OnSpellCast(Form akSpell)
     if repository.playerTrackingOnSpellCast
-    string spellCast = (akSpell as form).getname()
-        if spellCast
-            if spellCast == "Pantella" || spellCast == "PantellaPower"
-                ; Do not save event if Mantella itself is cast
-            else
+        string spellCast = (akSpell as form).getname()
+        if spellCast != "" 
+            if spellCast != "Pantella" && spellCast != "PantellaPower" && spellCast != ""
                 Actor player = Game.GetPlayer()
                 String playerName = player.GetActorBase().GetName()
-        
+                string OnSpellCastMessage = "player<OnSpellCast>spell_cast=" + spellCast + "\n"
                 ;Debug.Notification(playerName + " casted the spell "+ spellCast)
-                MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " casted the spell " + spellCast + ".\n")
+                MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnSpellCastMessage)
             endIf
         endIf
     endif
@@ -181,14 +195,15 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
 
             Actor player = Game.GetPlayer()
             String playerName = player.GetActorBase().GetName()
+            string OnHitMessage = ""
             if (hitSource == "None") || (hitSource == "")
-        
+                OnHitMessage = "player<OnHit>aggressor=" + aggressor + "\n"
                 ;Debug.MessageBox(aggressor + " punched the player.")
-                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " punched " + playerName + ".\n")
             else
+                OnHitMessage = "player<OnHitFromSource>aggressor=" + aggressor + "|hit_source="+hitSource+"\n"
                 ;Debug.MessageBox(aggressor + " hit the player with " + hitSource+".\n")
-                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " hit " + playerName + " with " + hitSource+".\n")
             endIf
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnHitMessage)
         else
             timesHitSameAggressorSource += 1
         endIf
@@ -207,8 +222,9 @@ Event OnLocationChange(Location akOldLoc, Location akNewLoc)
         if currLoc == ""
             currLoc = "Skyrim"
         endIf
+        string OnHitMessage = "player<OnLocationChange>current_location=" + currLoc + "\n"
         ;Debug.MessageBox("Current location is now " + currLoc)
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", "Current location is now " + currLoc+".\n")
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnHitMessage)
     endif
 endEvent
 
@@ -218,8 +234,11 @@ Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
         String playerName = player.GetActorBase().GetName()
 
         string itemEquipped = akBaseObject.getname()
-        ;Debug.MessageBox(playerName + " equipped " + itemEquipped)
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " equipped " + itemEquipped + ".\n")
+        if itemEquipped != ""
+            string OnObjectEquippedMessage = "player<OnObjectEquipped>item_name="+itemEquipped+"\n"
+            ;Debug.MessageBox(playerName + " equipped " + itemEquipped)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnObjectEquippedMessage)
+        endIf
     endif
 endEvent
 
@@ -229,8 +248,11 @@ Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
         String playerName = player.GetActorBase().GetName()
 
         string itemUnequipped = akBaseObject.getname()
-        ;Debug.MessageBox(playerName + " unequipped " + itemUnequipped)
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " unequipped " + itemUnequipped + ".\n")
+        if itemUnequipped != ""
+            string OnObjectUnequippedMessage = "player<OnObjectUnequipped>item_name="+itemUnequipped+"\n"
+            ;Debug.MessageBox(playerName + " unequipped " + itemUnequipped)
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnObjectUnequippedMessage)
+        endIf
     endif
 endEvent
 
@@ -238,9 +260,22 @@ Event OnPlayerBowShot(Weapon akWeapon, Ammo akAmmo, float afPower, bool abSunGaz
     if repository.playerTrackingOnPlayerBowShot
         Actor player = Game.GetPlayer()
         String playerName = player.GetActorBase().GetName()
-
+        String akAmmoName = akAmmo.GetName()
+        String akWeaponName = akWeapon.GetName()
+        string OnPlayerBowShotMessage = "player<OnBowShot>\n"
+        if akAmmoName != ""
+            if akWeaponName != ""
+                OnPlayerBowShotMessage = "player<OnBowShotAmmoNamedWeaponNamed>item_name="+akWeaponName+"|ammo="+akAmmoName+"\n"
+            else
+                OnPlayerBowShotMessage = "player<OnBowShotAmmoNamed>ammo="+akAmmoName+"\n"
+            endif
+        else
+            if akWeaponName != ""
+                OnPlayerBowShotMessage = "player<OnBowShotWeaponNamed>item_name="+akWeaponName+"\n"
+            endif
+        endif
         ;Debug.MessageBox(playerName + " fired an arrow.")
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " fired an arrow.\n")
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnPlayerBowShotMessage)
     endif
 endEvent
 
@@ -251,7 +286,10 @@ Event OnSit(ObjectReference akFurniture)
 
         ;Debug.MessageBox(playerName + " sat down.")
         String furnitureName = akFurniture.getbaseobject().getname()
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " rested on / used a(n) "+furnitureName+".\n")
+        if furnitureName != ""
+            string OnSitMessage = "player<OnSit>furniture_name="+furnitureName+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnSitMessage)
+        endIf
     endif
 endEvent
 
@@ -262,7 +300,10 @@ Event OnGetUp(ObjectReference akFurniture)
         
         ;Debug.MessageBox(playerName + " stood up.")
         String furnitureName = akFurniture.getbaseobject().getname()
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " stood up from a(n) "+furnitureName+".\n")
+        if furnitureName != ""
+            string OnGetUpMessage = "player<OnGetUp>furniture_name="+furnitureName+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnGetUpMessage)
+        endIf
     endif
 EndEvent
 
@@ -274,36 +315,41 @@ Event OnVampireFeed(Actor akTarget)
     if repository.playerTrackingOnVampireFeed
         Actor player = Game.GetPlayer()
         String playerName = player.GetActorBase().GetName()
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " sunk their long pointed fangs into " + akTarget.getdisplayname() + " supple neck flesh, and sucked their blood for some time.\n")
+        string OnVampireFeedMessage = "player<OnVampireFeed>target="+akTarget.getdisplayname()+"\n"
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnVampireFeedMessage)
     endif
 EndEvent
 Event OnPlayerFastTravelEnd(float afTravelDuration)
     if repository.playerTrackingOnFastTravelEnd
         Actor player = Game.GetPlayer()
         String playerName = player.GetActorBase().GetName()
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " travelled travelled for " + afTravelDuration + " hours.\n")
+        string OnVampireFeedMessage = "player<OnFastTravelEnd>travel_duration="+afTravelDuration+"\n"
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnVampireFeedMessage)
     endif
 EndEvent
 Event OnVampirismStateChanged(bool abVampire)
     if repository.playerTrackingOnVampirismStateChanged
         Actor player = Game.GetPlayer()
         String playerName = player.GetActorBase().GetName()
-        
+        string OnVampirismStateChangedMessage = ""
         if abVampire
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " was turned into a vampire after succumbing to Sanguinare Vampiris.\n")
+            OnVampirismStateChangedMessage = "player<OnVampirismStateChangedTrue>\n"
         else
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " cured their vampirism.\n")
+            OnVampirismStateChangedMessage = "player<OnVampirismStateChangedFalse>\n"
         endif
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnVampirismStateChangedMessage)
     endif
 EndEvent
 Event OnLycanthropyStateChanged(Bool abIsWerewolf)
     if repository.playerTrackingOnLycanthropyStateChanged
         Actor player = Game.GetPlayer()
         String playerName = player.GetActorBase().GetName()
+        string OnLycanthropyStateChangedMessage = ""
         if abIsWerewolf
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " became a werewolf after contracting Sanies Lupinus.\n")
+            OnLycanthropyStateChangedMessage = "player<OnLycanthropyStateChangedTrue>\n"
         else
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", playerName + " cured their lycanthropy and is no longer a werewolf.\n")
+            OnLycanthropyStateChangedMessage = "player<OnLycanthropyStateChangedFalse>\n"
         endif
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnLycanthropyStateChangedMessage)
     endif
 EndEvent

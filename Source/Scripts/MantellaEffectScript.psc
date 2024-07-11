@@ -20,7 +20,6 @@ event OnEffectStart(Actor target, Actor caster)
 	;MiscUtil.WriteToFile("_mantella_end_conversation.txt", "False",  append=false)
     
     PlayerRef = Game.GetPlayer()
-    String playerRace = PlayerRef.GetRace().GetName()
     Int playerGenderID = PlayerRef.GetActorBase().GetSex()
     String playerGender = ""
     if (playerGenderID == 0)
@@ -30,12 +29,8 @@ event OnEffectStart(Actor target, Actor caster)
     endIf
     String playerName = PlayerRef.GetActorBase().GetName()
     MiscUtil.WriteToFile("_pantella_player_name.txt", playerName, append=false)
-    MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)
+    MiscUtil.WriteToFile("_pantella_player_race.txt", PlayerRef.GetRace().GetName(), append=false)
     MiscUtil.WriteToFile("_pantella_player_gender.txt", playerGender, append=false)
-    String playerIsArrested = PlayerRef.IsArrested()
-    MiscUtil.WriteToFile("_pantella_player_is_arrested.txt", playerIsArrested, append=false)
-    String playerLightLevel = PlayerRef.GetLightLevel()
-    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
     
     MiscUtil.WriteToFile("_pantella_skyrim_folder.txt", "Set the folder this file is in as your skyrim_folder path in PantellaSoftware/config.json", append=false)
 	; only run script if actor is not already selected
@@ -68,7 +63,7 @@ event OnEffectStart(Actor target, Actor caster)
         actorAlreadyLoaded = false
     endIf
 
-    String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
+    String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String ;get radiant dialogue status from _pantella_radiant_dialogue.txt from Python
     Bool isCasterPlayer = (caster == PlayerRef)
     Debug.Notification("isCasterPlayer: " + isCasterPlayer as String)
     
@@ -96,97 +91,104 @@ event OnEffectStart(Actor target, Actor caster)
 			UIExtensions.OpenMenu("UITextEntryMenu")
 			string result1 = UIExtensions.GetMenuResultString("UITextEntryMenu")
 			MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", result1, append=false)
-		else ; if debug select mode is not active, use the actor's RefID as the ID to have a conversation with
-		    MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", actorRefId, append=false)
-		endIf
-        MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", actorBaseId, append=false)
-
-
-        ; Get NPC's name and save name to _pantella_current_actor.txt for Python to read
-		if repository.NPCdebugSelectModeEnabled==true ;if debug select mode is active this will allow the user to enter in the RefID of the NPC bio/voice to have a conversation with
+            
+            Debug.Messagebox("Enter the actor's BaseID(in base 10) that you wish to speak to") ; TODO: Support BaseID input for debug select mode
+            Utility.Wait(0.1)
+			UIExtensions.InitMenu("UITextEntryMenu")
+			UIExtensions.OpenMenu("UITextEntryMenu")
+			string result2 = UIExtensions.GetMenuResultString("UITextEntryMenu")
+			MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", result1, append=false)
+            MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", result2, append=false)
+            
             Debug.Messagebox("Enter the name of the actor that you wish to speak to")
             Utility.Wait(0.1)
 			UIExtensions.InitMenu("UITextEntryMenu")
 			UIExtensions.OpenMenu("UITextEntryMenu")
-			string result2 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;get actor name from user input
-			MiscUtil.WriteToFile("_pantella_current_actor.txt", result2, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
-            MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
-            MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
-		else ;if debug select mode is not active, use the actor's name as the name to have a conversation with
+			string result3 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;get actor name from user input
+			MiscUtil.WriteToFile("_pantella_current_actor.txt", result3, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+result3+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
+
+            Debug.Notification("Enter the race of the actor that you wish to speak to")
+            Utility.Wait(0.1)
+            UIExtensions.InitMenu("UITextEntryMenu")
+            UIExtensions.OpenMenu("UITextEntryMenu")
+            string result4 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;
+            MiscUtil.WriteToFile("_pantella_current_actor_race.txt", result4, append=false)
+
+            Debug.Notification("Enter the gender of the actor that you wish to speak to")
+            Utility.Wait(0.1)
+            UIExtensions.InitMenu("UITextEntryMenu")
+            UIExtensions.OpenMenu("UITextEntryMenu")
+            string result5 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;
+            MiscUtil.WriteToFile("__pantella_current_actor_gender.txt", result5, append=false)
+		else ; if debug select mode is not active, use the actor's RefID as the ID to have a conversation with
+		    MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", actorRefId, append=false)
+            MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", actorBaseId, append=false)
 			MiscUtil.WriteToFile("_pantella_current_actor.txt", targetName, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
             MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
-            MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
+            MiscUtil.WriteToFile("_pantella_current_actor_race.txt", target.GetRace().GetName(), append=false)
+            Int genderID = target.GetActorBase().GetSex() ; Should I use GetLeveledActorBase instead...?
+            String gender = ""
+            if (genderID == 0)
+                gender = "Male"
+            else
+                gender = "Female"
+            endIf
+            MiscUtil.WriteToFile("_pantella_current_actor_gender.txt", gender, append=false)
 		endIf
+        MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 
 		target.addtofaction(repository.giafac_Mantella);gia 
 		
-        String actorSex = target.GetLeveledActorBase().GetSex()
-        MiscUtil.WriteToFile("_pantella_actor_sex.txt", actorSex, append=false)
-
-        String actorRace = target.GetRace()
-        MiscUtil.WriteToFile("_pantella_actor_race.txt", actorRace, append=false)
-
         String actorIsGuard = target.IsGuard()
         MiscUtil.WriteToFile("_pantella_actor_is_guard.txt", actorIsGuard, append=false)
-
-        String actorIsGhost = target.IsGhost()
-        MiscUtil.WriteToFile("_pantella_actor_is_ghost.txt", actorIsGhost, append=false)
-
-        String actorIsTrespassing = target.IsTrespassing()
-        MiscUtil.WriteToFile("_pantella_actor_is_trespassing.txt", actorIsTrespassing, append=false)
-
-        String actorIsInCombat = target.IsInCombat()
-        MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", actorIsInCombat, append=false)
-
-        String actorIsUnconscious = target.IsUnconscious()
-        MiscUtil.WriteToFile("_pantella_actor_is_unconscious.txt", actorIsUnconscious, append=false)
-
-        String actorIsIntimidated = target.IsIntimidated()
-        MiscUtil.WriteToFile("_pantella_actor_is_intimidated.txt", actorIsIntimidated, append=false)
-        
-        String actorHasWeaponDrawn = target.IsWeaponDrawn()
-        MiscUtil.WriteToFile("_pantella_actor_has_weapon_drawn.txt", actorHasWeaponDrawn, append=false)
-
-        String actorIsPlayerTeammate = target.IsPlayerTeammate()
-        MiscUtil.WriteToFile("_pantella_actor_is_player_teammate.txt", actorIsPlayerTeammate, append=false)
-
-        ; String actorIsRidingHorse = target.IsRidingHorse()
-        ; MiscUtil.WriteToFile("_pantella_actor_is_riding_horse.txt", actorIsRidingHorse, append=false)
-
-        String actorDetectsPlayer = PlayerRef.IsDetectedBy(target)
-        MiscUtil.WriteToFile("_pantella_actor_detects_player.txt", actorDetectsPlayer, append=false)
-
-        String actorIsBribed = target.IsBribed()
-        MiscUtil.WriteToFile("_pantella_actor_is_bribed.txt", actorIsBribed, append=false)
-
-        String actorIsArrested = target.IsArrested()
-        MiscUtil.WriteToFile("_pantella_actor_is_arrested.txt", actorIsArrested, append=false)
-
-        String actorIsArrestingSomeone = target.IsArrestingTarget()
-        MiscUtil.WriteToFile("_pantella_actor_is_arresting_someone.txt", actorIsArrestingSomeone, append=false)
-
-        String actorLightLevel = target.GetLightLevel()
-        MiscUtil.WriteToFile("_pantella_actor_light_level.txt", actorLightLevel, append=false)
-
-        String actorRelationship = target.GetRelationshipRank(PlayerRef)
-        MiscUtil.WriteToFile("_pantella_actor_relationship.txt", actorRelationship, append=false)
 
         String actorVoiceType = target.GetVoiceType()
         MiscUtil.WriteToFile("_pantella_actor_voice.txt", actorVoiceType, append=false)
 
-        String isEnemy = "False"
-        if (target.GetCombatTarget() == PlayerRef)
-            isEnemy = "True"
-        endIf
-        MiscUtil.WriteToFile("_pantella_actor_is_enemy.txt", isEnemy, append=false)
-        
         String currLoc = (caster.GetCurrentLocation() as form).getname()
+
         if currLoc == ""
             currLoc = "Skyrim"
         endIf
         MiscUtil.WriteToFile("_pantella_current_location.txt", currLoc, append=false)
 
-        UpdateTime() ; update time to be used for the time of day in the conversation
+        Update(target, caster) ; update time to be used for the time of day in the conversation
+        String actorRelationship = target.GetRelationshipRank(PlayerRef)
+
+        String[] target_factions = GetActorFactions(target)
+        String[] caster_factions = GetActorFactions(caster)
+        String target_factions_str = ""
+        String caster_factions_str = ""
+        Int i = 0
+        while i < target_factions.Length
+            target_factions_str += target_factions[i] + "\n"
+            i += 1
+        endwhile
+        i = 0
+        while i < caster_factions.Length
+            caster_factions_str += caster_factions[i] + "\n"
+            i += 1
+        endwhile
+        MiscUtil.WriteToFile("_pantella_target_factions.txt", target_factions_str, append=false)
+        MiscUtil.WriteToFile("_pantella_caster_factions.txt", caster_factions_str, append=false)
+
+        String[] target_spells = GetActorSpells(target)
+        String[] caster_spells = GetActorSpells(caster)
+        String target_spells_str = ""
+        String caster_spells_str = ""
+        i = 0
+        while i < target_spells.Length
+            target_spells_str += target_spells[i] + "\n"
+            i += 1
+        endwhile
+        i = 0
+        while i < caster_spells.Length
+            caster_spells_str += caster_spells[i] + "\n"
+            i += 1
+        endwhile
+        MiscUtil.WriteToFile("_pantella_target_spells.txt", target_spells_str, append=false)
+        MiscUtil.WriteToFile("_pantella_caster_spells.txt", caster_spells_str, append=false)
 
         MiscUtil.WriteToFile("_pantella_actor_count.txt", actorCount, append=false)
 
@@ -294,7 +296,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
             MiscUtil.WriteToFile("_pantella_actor_methods.txt", newActorMethods,  append=false)
         endIf
         
-        UpdateTime()
+        Update(target, caster)
 
         caster.SetLookAt(target)
     endIf
@@ -556,18 +558,103 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
     return true
 endfunction
 
-function UpdateTime()
-	string Time = Utility.GameTimeToString(Utility.GetCurrentGameTime()) ; Example: 07/12/0713 10:31 - Will be parsed in Python
-    MiscUtil.WriteToFile("_pantella_in_game_time.txt", Time, append=false)
-endFunction
+function Update(Actor target, Actor caster)
+    String playerIsArrested = PlayerRef.IsArrested()
+    MiscUtil.WriteToFile("_pantella_player_is_arrested.txt", playerIsArrested, append=false)
 
-function SplitSubtitleIntoParts(String subtitle)
-    String[] subtitles = PapyrusUtil.StringSplit(subtitle, ",")
-    int subtitleNo = 0
-    while (subtitleNo < subtitles.Length)
-        Debug.Notification(subtitles[subtitleNo])
-        subtitleNo += 1
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
+
+    String playerIsInCombat = PlayerRef.IsInCombat()
+    MiscUtil.WriteToFile("_pantella_player_is_in_combat.txt", playerIsInCombat, append=false)
+
+    String playerIsTrespassing = PlayerRef.IsTrespassing()
+    MiscUtil.WriteToFile("_pantella_player_is_trespassing.txt", playerIsTrespassing, append=false)
+
+    String isEnemy = "False"
+    if (target.GetCombatTarget() == PlayerRef)
+        isEnemy = "True"
+    endIf
+    MiscUtil.WriteToFile("_pantella_actor_is_enemy.txt", isEnemy, append=false)
+
+    String actorIsGhost = target.IsGhost()
+    MiscUtil.WriteToFile("_pantella_actor_is_ghost.txt", actorIsGhost, append=false)
+
+    String actorIsTrespassing = target.IsTrespassing()
+    MiscUtil.WriteToFile("_pantella_actor_is_trespassing.txt", actorIsTrespassing, append=false)
+
+    String actorIsInCombat = target.IsInCombat()
+    MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", actorIsInCombat, append=false)
+
+    String actorIsUnconscious = target.IsUnconscious()
+    MiscUtil.WriteToFile("_pantella_actor_is_unconscious.txt", actorIsUnconscious, append=false)
+
+    String actorIsIntimidated = target.IsIntimidated()
+    MiscUtil.WriteToFile("_pantella_actor_is_intimidated.txt", actorIsIntimidated, append=false)
+    
+    String actorHasWeaponDrawn = target.IsWeaponDrawn()
+    MiscUtil.WriteToFile("_pantella_actor_has_weapon_drawn.txt", actorHasWeaponDrawn, append=false)
+
+    String actorIsPlayerTeammate = target.IsPlayerTeammate()
+    MiscUtil.WriteToFile("_pantella_actor_is_player_teammate.txt", actorIsPlayerTeammate, append=false)
+
+    ; String actorIsRidingHorse = target.IsRidingHorse()
+    ; MiscUtil.WriteToFile("_pantella_actor_is_riding_horse.txt", actorIsRidingHorse, append=false)
+
+    ; String casterIsRidingHorse = caster.IsRidingHorse()
+    ; MiscUtil.WriteToFile("_pantella_caster_is_riding_horse.txt", casterIsRidingHorse, append=false)
+
+    Bool actorDetectsCasterBool = caster.IsDetectedBy(target)
+    String actorDetectsCaster = "False"
+    if actorDetectsCasterBool
+        actorDetectsCaster = "True"
+    endIf
+    MiscUtil.WriteToFile("_pantella_actor_detects_caster.txt", actorDetectsCaster, append=false)
+
+    Bool casterDetectsTargetBool = target.IsDetectedBy(caster)
+    String casterDetectsActor = "False"
+    if actorDetectsCasterBool
+        actorDetectsCaster = "True"
+    endIf
+    MiscUtil.WriteToFile("_pantella_caster_detects_actor.txt", casterDetectsActor, append=false)
+
+    String actorIsBribed = target.IsBribed()
+    MiscUtil.WriteToFile("_pantella_actor_is_bribed.txt", actorIsBribed, append=false)
+
+    String actorIsArrested = target.IsArrested()
+    MiscUtil.WriteToFile("_pantella_actor_is_arrested.txt", actorIsArrested, append=false)
+
+    String actorIsArrestingSomeone = target.IsArrestingTarget()
+    MiscUtil.WriteToFile("_pantella_actor_is_arresting_someone.txt", actorIsArrestingSomeone, append=false)
+
+    String actorLightLevel = target.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_actor_light_level.txt", actorLightLevel, append=false)
+
+    String casterLightLevel = caster.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_caster_light_level.txt", casterLightLevel, append=false)
+
+    String actorRelationship = target.GetRelationshipRank(PlayerRef)
+    MiscUtil.WriteToFile("_pantella_actor_relationship.txt", actorRelationship, append=false)
+
+	string Time = Utility.GameTimeToString(Utility.GetCurrentGameTime())
+    MiscUtil.WriteToFile("_pantella_in_game_time.txt", Time, append=false) ; Example: 07/12/0713 10:31 - Will be parsed in Python
+
+    String[] actorEquipment = GetActorEquipment(target)
+    String[] casterEquipment = GetActorEquipment(caster)
+    String actorEquipmentString = ""
+    String casterEquipmentString = ""
+    Int i = 0
+    while i < actorEquipment.Length
+        actorEquipmentString += actorEquipment[i] + "\n"
+        i += 1
     endwhile
+    i = 0
+    while i < casterEquipment.Length
+        casterEquipmentString += casterEquipment[i] + "\n"
+        i += 1
+    endwhile
+    MiscUtil.WriteToFile("_pantella_actor_equipment.txt", actorEquipmentString, append=false)
+    MiscUtil.WriteToFile("_pantella_caster_equipment.txt", casterEquipmentString, append=false)
 endFunction
 
 function StartTimer()
@@ -634,38 +721,88 @@ Float Function ConvertGameUnitsToMeter(Float gameUnits)
     Return gameUnits / meterUnits
 EndFunction
 
-; function GetActorEquipment(Actor actor)
-;     ; Array containing list of all Equipment location IDs
-;     Int[] EquipmentSlots = [
-;         30, ; head
-;         31, ; hair
-;         32, ; body (full)
-;         33, ; hands
-;         34, ; forearms
-;         35, ; amulet
-;         36, ; ring
-;         37, ; feet
-;         38, ; calves
-;         39, ; shield
-;         42, ; circlet
-;         43  ; ears
-;     ]
-;     ; Create a new array to store the equipment
-;     String[] equipment = new String[EquipmentSlots.Length]
-;     ; Loop through each equipment slot
-;     Int i = 0
-;     While i < EquipmentSlots.Length
-;         ; Get the form in the equipment slot
-;         Form form = actor.GetWornForm(EquipmentSlots[i])
-;         ; If the form is not None, get the name and store it in the array
-;         If form != None
-;             equipment[i] = form.GetName()
-;         Else
-;             equipment[i] = ""
-;         EndIf
-;         ; Increment the counter
-;         i += 1
-;     EndWhile
-;     ; Return the array
-;     Return equipment
-; EndFunction
+String[] function GetActorEquipment(Actor equiped_actor)
+    ; Array containing list of all Equipment location IDs
+    ; Int[] EquipmentSlots = [
+    ;     0,  ; left hand
+    ;     1,  ; right hand
+    ;     2,  ; shout
+    ;     30, ; head
+    ;     31, ; hair
+    ;     32, ; body (full)
+    ;     33, ; hands
+    ;     34, ; forearms
+    ;     35, ; amulet
+    ;     36, ; ring
+    ;     37, ; feet
+    ;     38, ; calves
+    ;     39, ; shield
+    ;     42, ; circlet
+    ;     43  ; ears
+    ; ]
+    Int[] EquipmentSlots = new Int[15]
+    EquipmentSlots[0] = 30
+    EquipmentSlots[1] = 31
+    EquipmentSlots[2] = 32
+    EquipmentSlots[3] = 33
+    EquipmentSlots[4] = 34
+    EquipmentSlots[5] = 35
+    EquipmentSlots[6] = 36
+    EquipmentSlots[7] = 37
+    EquipmentSlots[8] = 38
+    EquipmentSlots[9] = 39
+    EquipmentSlots[10] = 42
+    EquipmentSlots[11] = 43
+    ; Create a new array to store the equipment
+    String[] equipment = new String[15]
+    ; Loop through each equipment slot
+    Int i = 0
+    While i < EquipmentSlots.Length
+        ; Get the form in the equipment slot
+        form equipment_in_slot_form = equiped_actor.GetEquippedObject(EquipmentSlots[i])
+        ; If there is an item in the slot, add it to the equipment array
+        String equipmentName = "NONE"
+        If equipment_in_slot_form != None
+            equipmentName = equipment_in_slot_form.GetName()
+        EndIf
+        String equipmentSlot = EquipmentSlots[i] as String
+        String equipmentID = equiped_actor.GetEquippedItemId(EquipmentSlots[i])
+        equipment[i] = equipmentSlot + "|" + equipmentName + "|" + equipmentID
+        i += 1
+    EndWhile
+    ; Return the equipment array
+    Return equipment
+EndFunction
+
+String[] function GetActorFactions(Actor factioned_actor)
+    Faction[] factions = factioned_actor.GetFactions(-128, 127)
+    Int faction_count = factions.Length
+    String[] factions_strings = new String[44] ; There are 44 total factions according to the wiki. There might be more, but if any single NPC has that many then I guess I'll increase this size when that error comes around.
+    Int i = 0
+    While i < factions.Length
+        String factionName = factions[i].GetName()
+        String factionRank = factioned_actor.GetFactionRank(factions[i]) as String
+        factions_strings[i] = factionName + "|" + factionRank
+        i += 1
+    EndWhile
+    Return factions_strings
+EndFunction
+
+String[] function GetActorSpells(Actor spelling_actor)
+    Int SpellCount = spelling_actor.GetSpellCount()
+    String[] SpellList = new String[128]
+    if SpellCount > 128
+        String actor_name = spelling_actor.GetDisplayName()
+        Debug.Notification("WARNING: Actor '"+actor_name+"' has too many spells to send to Pantella!")
+    endif
+    Int i = 0
+    While i < SpellCount
+        Spell spell_at_index = spelling_actor.GetNthSpell(i)
+        String spellName = spell_at_index.GetName()
+        if i < 127
+            SpellList[i] = spellName
+        endif
+        i += 1
+    endwhile
+    return SpellList
+EndFunction

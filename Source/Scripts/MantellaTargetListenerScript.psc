@@ -8,13 +8,11 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
         String selfName = self.GetActorReference().getdisplayname()
         string itemName = akBaseItem.GetName()
         string itemPickedUpMessage = selfName+" picked up " + itemName + ".\n"
-
         string sourceName = akSourceContainer.getbaseobject().getname()
-        if sourceName != ""
-            itemPickedUpMessage = selfName+" picked up " + itemName + " from " + sourceName + ".\n"
-        endIf
-        
-        if (itemName != "Iron Arrow") && (itemName != "") ;Papyrus hallucinates iron arrows
+        if itemName != "Iron Arrow" && itemName != "" ;Papyrus hallucinates iron arrows
+            if sourceName != ""
+                itemPickedUpMessage = "npc<OnItemAdded>|name="+selfName+"|item="+itemName+"|source="+sourceName+"\n"
+            endIf
             ;Debug.Notification(itemPickedUpMessage)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemPickedUpMessage)
         endIf
@@ -26,14 +24,13 @@ Event OnItemRemoved(Form akBaseItem, int aiItemCount, ObjectReference akItemRefe
     if repository.targetTrackingItemRemoved  
         String selfName = self.GetActorReference().getdisplayname()
         string itemName = akBaseItem.GetName()
-        string itemDroppedMessage = selfName+" dropped " + itemName + ".\n"
+        if itemName != "" || itemName != "Iron Arrow" ; Papyrus hallucinates iron arrows
+            string itemDroppedMessage = "npc<OnItemRemoved>name="+selfName+"|item_name=" + itemName + "\n"
 
-        string destName = akDestContainer.getbaseobject().getname()
-        if destName != ""
-            itemDroppedMessage = selfName+" placed " + itemName + " in/on " + destName + ".\n"
-        endIf
-        
-        if  (itemName != "Iron Arrow") && (itemName != "") ; Papyrus hallucinates iron arrows
+            string destName = akDestContainer.getbaseobject().getname()
+            if destName != ""
+                itemDroppedMessage = "npc<OnItemRemovedToDestination>name="+selfName+"|item_name=" + itemName + "|source_name=" + destName + "\n"
+            endIf
             ;Debug.Notification(itemDroppedMessage)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemDroppedMessage)
         endIf
@@ -45,9 +42,12 @@ Event OnSpellCast(Form akSpell)
     if repository.targetTrackingOnSpellCast 
         String selfName = self.GetActorReference().getdisplayname()
         string spellCast = (akSpell as form).getname()
-        if spellCast 
-            ;Debug.Notification(selfName+" casted the spell "+ spellCast)
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" casted the spell " + spellCast + ".\n")
+        if spellCast != "" 
+            if spellCast != "Pantella" && spellCast != "PantellaPower" && spellCast != ""
+                ;Debug.Notification(selfName+" casted the spell "+ spellCast)
+                string OnSpellCastMessage = "npc<OnSpellCast>name="+selfName+"|spell_cast=" + spellCast + "\n"
+                MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnSpellCastMessage)
+            endIf
         endIf
     endif
 endEvent
@@ -60,7 +60,7 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
     if repository.targetTrackingOnSpellCast 
         String aggressor
         if akAggressor == Game.GetPlayer()
-            aggressor = "The player"
+            aggressor = "[player]"
         else
             aggressor = akAggressor.getdisplayname()
         endif
@@ -74,15 +74,15 @@ Event OnHit(ObjectReference akAggressor, Form akSource, Projectile akProjectile,
             lastAggressor = aggressor
             timesHitSameAggressorSource = 0
 
+            string OnHitMessage = ""
             if (hitSource == "None") || (hitSource == "")
-                ;Debug.MessageBox(aggressor + " punched "+selfName+".")
-                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " punched "+selfName+".\n")
-            elseif hitSource == "Pantella"
-                ; Do not save event if Pantella itself is cast
+                OnHitMessage = "npc<OnHit>name="+selfName+"|aggressor=" + aggressor + "\n"
+                ;Debug.MessageBox(aggressor + " punched the player.")
             else
-                ;Debug.MessageBox(aggressor + " hit "+selfName+" with a(n) " + hitSource)
-                MiscUtil.WriteToFile("_pantella_in_game_events.txt", aggressor + " hit "+selfName+" with " + hitSource+".\n")
+                OnHitMessage = "npc<OnHitFromSource>name="+selfName+"|aggressor=" + aggressor + "|hit_source="+hitSource+"\n"
+                ;Debug.MessageBox(aggressor + " hit the player with " + hitSource+".\n")
             endIf
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnHitMessage)
         else
             timesHitSameAggressorSource += 1
         endIf
@@ -95,22 +95,23 @@ Event OnCombatStateChanged(Actor akTarget, int aeCombatState)
         String selfName = self.GetActorReference().getdisplayname()
         String targetName
         if akTarget == Game.GetPlayer()
-            targetName = "the player"
+            targetName = "[player]"
         else
             targetName = akTarget.getdisplayname()
         endif
 
+        String combatStateMessage = ""
         if (aeCombatState == 0)
             ;Debug.MessageBox(selfName+" is no longer in combat")
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" is no longer in combat.\n")
-            MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", "False", append=false)
+            combatStateMessage = "npc<OnCombatStateChanged0>name="+selfName+"|target="+targetName+"n"
         elseif (aeCombatState == 1)
             ;Debug.MessageBox(selfName+" has entered combat with "+targetName)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" has entered combat with "+targetName+".\n")
-            MiscUtil.WriteToFile("_pantella_actor_is_in_combat.txt", "True", append=false)
+            combatStateMessage = "npc<OnCombatStateChanged1>name="+selfName+"|target="+targetName+"\n"
         elseif (aeCombatState == 2)
             ;Debug.MessageBox(selfName+" is searching for "+targetName)
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" is searching for "+targetName+".\n")
+            combatStateMessage = "npc<OnCombatStateChanged2>name="+selfName+"|target="+targetName+"\n"
         endIf
     endif
 endEvent
@@ -120,8 +121,11 @@ Event OnObjectEquipped(Form akBaseObject, ObjectReference akReference)
     if repository.targetTrackingOnObjectEquipped
         String selfName = self.GetActorReference().getdisplayname()
         string itemEquipped = akBaseObject.getname()
-        ;Debug.MessageBox(selfName+" equipped " + itemEquipped)
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" equipped " + itemEquipped + ".\n")
+        if itemEquipped != ""
+            ;Debug.MessageBox(selfName+" equipped " + itemEquipped)
+            string OnObjectEquippedMessage = "npc<OnObjectEquipped>name="+selfName+"|item_name="+itemEquipped+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnObjectEquippedMessage)
+        endIf
     endif
 endEvent
 
@@ -130,8 +134,11 @@ Event OnObjectUnequipped(Form akBaseObject, ObjectReference akReference)
     if repository.targetTrackingOnObjectUnequipped
         String selfName = self.GetActorReference().getdisplayname()
         string itemUnequipped = akBaseObject.getname()
-        ;Debug.MessageBox(selfName+" unequipped " + itemUnequipped)
-        MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" unequipped " + itemUnequipped + ".\n")
+        if itemUnequipped != ""
+            ;Debug.MessageBox(selfName+" unequipped " + itemUnequipped)
+            string OnObjectUnequippedMessage = "npc<OnObjectUnequipped>name="+selfName+"|item_name="+itemUnequipped+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnObjectUnequippedMessage)
+        endIf
     endif
 endEvent
 
@@ -143,7 +150,8 @@ Event OnSit(ObjectReference akFurniture)
         String furnitureName = akFurniture.getbaseobject().getname()
         ; only save event if actor is sitting / resting on furniture (and not just, for example, leaning on a bar table)
         if furnitureName != ""
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" rested on / used a(n) "+furnitureName+".\n")
+            String OnSitMessage = "npc<OnSit>name="+selfName+"|furniture_name="+furnitureName+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnSitMessage)
         endIf
     endif
 endEvent
@@ -156,12 +164,51 @@ Event OnGetUp(ObjectReference akFurniture)
         String furnitureName = akFurniture.getbaseobject().getname()
         ; only save event if actor is sitting / resting on furniture (and not just, for example, leaning on a bar table)
         if furnitureName != ""
-            MiscUtil.WriteToFile("_pantella_in_game_events.txt", selfName+" stood up from a(n) "+furnitureName+".\n")
+            String OnGetUpMessage = "npc<OnGetUp>name="+selfName+"|furniture_name="+furnitureName+"\n"
+            MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnGetUpMessage)
         endIf
     endif
 EndEvent
 
-
 Event OnDying(Actor akKiller)
     MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
+EndEvent
+
+Event OnVampireFeed(Actor akTarget)
+    if repository.playerTrackingOnVampireFeed
+        String selfName = self.GetActorReference().getdisplayname()
+        string OnVampireFeedMessage = "npc<OnVampireFeed>name="+selfName+"|target="+akTarget.getdisplayname()+"\n"
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnVampireFeedMessage)
+    endif
+EndEvent
+Event OnPlayerFastTravelEnd(float afTravelDuration)
+    if repository.playerTrackingOnFastTravelEnd
+        String selfName = self.GetActorReference().getdisplayname()
+        string OnFastTravelEndMessage = "npc<OnFastTravelEnd>name="+selfName+"|travel_duration="+afTravelDuration+"\n"
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnFastTravelEndMessage)
+    endif
+EndEvent
+Event OnVampirismStateChanged(bool abVampire)
+    if repository.playerTrackingOnVampirismStateChanged
+        String selfName = self.GetActorReference().getdisplayname()
+        string OnVampirismStateChangedMessage = ""
+        if abVampire
+            OnVampirismStateChangedMessage = "npc<OnVampirismStateChangedTrue>name="+selfName+"\n"
+        else
+            OnVampirismStateChangedMessage = "npc<OnVampirismStateChangedFalse>name="+selfName+"\n"
+        endif
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnVampirismStateChangedMessage)
+    endif
+EndEvent
+Event OnLycanthropyStateChanged(Bool abIsWerewolf)
+    if repository.playerTrackingOnLycanthropyStateChanged
+        String selfName = self.GetActorReference().getdisplayname()
+        string OnLycanthropyStateChangedMessage = ""
+        if abIsWerewolf
+            OnLycanthropyStateChangedMessage = "npc<OnLycanthropyStateChangedTrue>name="+selfName+"\n"
+        else
+            OnLycanthropyStateChangedMessage = "npc<OnLycanthropyStateChangedFalse>name="+selfName+"\n"
+        endif
+        MiscUtil.WriteToFile("_pantella_in_game_events.txt", OnLycanthropyStateChangedMessage)
+    endif
 EndEvent
