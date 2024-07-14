@@ -13,6 +13,8 @@ Faction Property giafac_Mantella  Auto ;gia
 quest property gia_FollowerQst auto ;gia
 
 int property MantellaEndHotkey auto
+int property MantellaForgetLastMessageHotkey auto
+int property MantellaRegenLastMessageHotkey auto
 int property MantellaRadiantHotkey auto
 
 bool property radiantEnabled auto
@@ -117,6 +119,8 @@ event OnInit()
     MantellaAddToConversationHotkey = 35 ; The default key is the "H" key
     MantellaCustomGameEventHotkey = -1 ; Used to bind a hotkey to add a custom game event - Unbound by default
     MantellaEndHotkey = -1 ; Used to bind a hotkey to end the conversation - Unbound by default
+    MantellaForgetLastMessageHotkey = -1 ; Used to bind a hotkey to forget the last message - Unbound by default
+    MantellaRegenLastMessageHotkey = -1 ; Used to bind a hotkey to regenerate the last message - Unbound by default
     MantellaRadiantHotkey = -1 ; Used to bind a hotkey to enable/disable radiant dialogue - Unbound by default
     MantellaOpenContextMenuHotkey = -1 ; Used to bind a hotkey to open the context menu - Unbound by default
     MantellaOpenIndividualContextMenuHotkey = -1 ; Used to bind a hotkey to open the individual context menu - Unbound by default
@@ -124,6 +128,8 @@ event OnInit()
     BindPromptHotkey(MantellaOpenTextInputHotkey)
     BindAddToConversationHotkey(MantellaAddToConversationHotkey)
     BindEndHotkey(MantellaEndHotkey)
+    BindForgetLastMessageHotkey(MantellaForgetLastMessageHotkey)
+    BindRegenLastMessageHotkey(MantellaRegenLastMessageHotkey)
     BindCustomGameEventHotkey(MantellaCustomGameEventHotkey)
     BindRadiantHotkey(MantellaRadiantHotkey)
     BindOpenContextMenuHotkey(MantellaOpenContextMenuHotkey)
@@ -152,6 +158,20 @@ function BindEndHotkey(int keyCode)
     ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
     UnregisterForKey(MantellaEndHotkey)
     MantellaEndHotkey=keyCode
+    RegisterForKey(keyCode)
+endfunction
+
+function BindForgetLastMessageHotkey(int keyCode)
+    ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
+    UnregisterForKey(MantellaForgetLastMessageHotkey)
+    MantellaForgetLastMessageHotkey=keyCode
+    RegisterForKey(keyCode)
+endfunction
+
+function BindRegenLastMessageHotkey(int keyCode)
+    ;used by the MCM_GeneralSettings when updating the prompt hotkey KeyMapChange
+    UnregisterForKey(MantellaRegenLastMessageHotkey)
+    MantellaRegenLastMessageHotkey=keyCode
     RegisterForKey(keyCode)
 endfunction
 
@@ -222,13 +242,22 @@ Event OnKeyDown(int KeyCode)
         elseif KeyCode == MantellaEndHotkey
             MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
             MiscUtil.WriteToFile("_pantella_text_input.txt", "EndConversationNow", append=false)
-        elseif KeyCode == MantellaCustomGameEventHotkey && !utility.IsInMenuMode() 
+            Debug.Notification("Ending Conversation")
+        elseif KeyCode == MantellaForgetLastMessageHotkey
+            MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+            MiscUtil.WriteToFile("_pantella_text_input.txt", "ForgetLastMessage", append=false)
+            Debug.Notification("Forgetting Last Message")
+        elseif KeyCode == MantellaRegenLastMessageHotkey
+            MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
+            MiscUtil.WriteToFile("_pantella_text_input.txt", "RegenLastMessage", append=false)
+            Debug.Notification("Regenerating Last Response...")
+        elseif KeyCode == MantellaCustomGameEventHotkey 
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.OpenMenu("UITextEntryMenu")
             string gameEventEntry = UIExtensions.GetMenuResultString("UITextEntryMenu")
             gameEventEntry = gameEventEntry+"\n"
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", gameEventEntry)
-            endFlagMantellaConversationAll = false
+            ; endFlagMantellaConversationAll = false
         elseif KeyCode == MantellaRadiantHotkey
             radiantEnabled =! radiantEnabled
             if radiantEnabled == True

@@ -14,6 +14,8 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_keymapMantellaAddToConversationHotkey = mcm.AddKeyMapOption("Start Conversation / Add to Conversation", repository.MantellaAddToConversationHotkey)
     mcm.oid_keymapPromptHotkey = mcm.AddKeyMapOption("Open Text Prompt", repository.MantellaOpenTextInputHotkey)
     mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("End Conversation", repository.MantellaEndHotkey)
+    mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Forget Last Message", repository.MantellaForgetLastMessageHotkey)
+    mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Regen Last Response", repository.MantellaRegenLastMessageHotkey)
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
     mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
     mcm.oid_keymapOpenContextMenuHotkey = mcm.AddKeyMapOption("Open Context Menu", repository.MantellaOpenContextMenuHotkey)
