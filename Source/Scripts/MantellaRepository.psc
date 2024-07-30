@@ -111,6 +111,10 @@ event OnInit()
     ;variables below used by MCM_MainSettings
     MantellaEffectResponseTimer = 180
     microphoneEnabled = true
+    String microphoneEnabledString = MiscUtil.ReadFromFile("_pantella_microphone_enabled.txt") as String
+    if microphoneEnabledString == "false"
+        microphoneEnabled = false
+    endif
     radiantEnabled = false
     radiantDistance = 20
     radiantFrequency = 10
@@ -135,7 +139,6 @@ event OnInit()
     BindOpenContextMenuHotkey(MantellaOpenContextMenuHotkey)
     MantellaOpenIndividualContextMenuHotkey = 49 ; The default key is the "C" key
 
-    microphoneEnabled = true
     NPCdebugSelectModeEnabled = false
     context_string = "" ; This is the string that's fed to the prompt to give extra context to the LLM. When the player reopens the context input menu, this string is reloaded into the menu
 endEvent
