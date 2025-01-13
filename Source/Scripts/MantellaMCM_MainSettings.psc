@@ -17,14 +17,14 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     ; mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Forget Last Message", repository.MantellaForgetLastMessageHotkey) ; commented out until it's implemented
     ; mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Regen Last Response", repository.MantellaRegenLastMessageHotkey)
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
-    mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
+    mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue Shortcut", repository.MantellaRadiantHotkey) 
     mcm.oid_keymapOpenContextMenuHotkey = mcm.AddKeyMapOption("Open Context Menu", repository.MantellaOpenContextMenuHotkey)
     ; mcm.oid_keymapOpenIndividualContextMenuHotkey = mcm.AddKeyMapOption("Open Individual Context Menu", repository.MantellaOpenIndividualContextMenuHotkey)
 
     
-    mcm.AddHeaderOption("Settings")
-    mcm.oid_responsetimeslider=mcm.AddSliderOption ("Text Response wait time",repository.MantellaEffectResponseTimer)
-    mcm.oid_microphoneEnabledToggle=mcm.AddToggleOption("Microphone enabled", Repository.microphoneEnabled)
+    mcm.AddHeaderOption("Input Settings")
+    mcm.oid_responsetimeslider=mcm.AddSliderOption ("Text Response Wait Time",repository.MantellaEffectResponseTimer)
+    mcm.oid_microphoneEnabledToggle=mcm.AddToggleOption("Microphone Enabled", Repository.microphoneEnabled)
 endfunction
 
 function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
@@ -35,10 +35,8 @@ function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_radiantdistance = mcm.AddSliderOption("Trigger Distance",repository.radiantDistance)
     mcm.oid_radiantfrequency = mcm.AddSliderOption("Trigger Frequency",repository.radiantFrequency)
 
-    mcm.AddHeaderOption("Actions")
-	mcm.oid_AllowForNPCtoFollowToggle = mcm.AddToggleOption("Allow Follow (Experimental)", Repository.AllowForNPCtoFollow)
-	mcm.oid_NPCAngerToggle = mcm.AddToggleOption("Allow Aggro", Repository.NPCAnger)
-    mcm.oid_endFlagMantellaConversationAll=mcm.AddToggleOption("Fix multiple NPC repeating lines bug", Repository.endFlagMantellaConversationAll)
+    mcm.AddHeaderOption("Debug")
+    mcm.oid_endFlagMantellaConversationAll=mcm.AddToggleOption("End All Conversations (Fix Repeating NPCs)", Repository.endFlagMantellaConversationAll)
 endfunction
 
 function SliderOptionOpen(MantellaMCM mcm, int optionID, MantellaRepository Repository) global

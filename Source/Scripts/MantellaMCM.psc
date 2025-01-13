@@ -74,11 +74,11 @@ string MantellaMCMcurrentPage
 Event OnConfigInit()
 	;this part right here name all the pages we'll need (we can add more pages at the end as long as we update the numbers) and declares some variables
     ModName = "Pantella"
-	Pages = new string[4]
+	Pages = new string[1]
     Pages[0] = "Main settings"
-	Pages[1] = "Player tracking settings"
-	Pages[2] = "Target tracking settings"
- 	Pages[3] = "Following NPC settings"
+	; Pages[1] = "Player tracking settings"
+	; Pages[2] = "Target tracking settings"
+ 	; Pages[3] = "Following NPC settings"
 
 	;not tracking dying triggers they're only there as a check to end the conversation
 	;targetTrackingOnDyingToggle=true
@@ -97,27 +97,27 @@ Event OnPageReset(string page)
 	if page=="Main settings"
 		MantellaMCM_MainSettings.Render(self, repository)
 		MantellaMCMcurrentPage="Main settings"
-	elseif page=="Player tracking settings"
-		MantellaMCM_PlayerTrackingSettings.Render(self, repository)
-		MantellaMCMcurrentPage="Player tracking settings"
-	elseif page=="Target tracking settings"
-		MantellaMCM_TargetTrackingSettings.Render(self, repository)
-		MantellaMCMcurrentPage="Target tracking settings"
-	elseif page=="Following NPC settings"
-		MantellaMCM_FollowingNPCSettings.Render(self, repository)
-		MantellaMCMcurrentPage="Following NPC settings"
+	; elseif page=="Player tracking settings"
+	; 	MantellaMCM_PlayerTrackingSettings.Render(self, repository)
+	; 	MantellaMCMcurrentPage="Player tracking settings"
+	; elseif page=="Target tracking settings"
+	; 	MantellaMCM_TargetTrackingSettings.Render(self, repository)
+	; 	MantellaMCMcurrentPage="Target tracking settings"
+	; elseif page=="Following NPC settings"
+	; 	MantellaMCM_FollowingNPCSettings.Render(self, repository)
+	; 	MantellaMCMcurrentPage="Following NPC settings"
 	endif		
 EndEvent
 ;This part of the MCM below is a bunch of event listeners, they all use functions to link to the appropriate MCM scripts 
 Event OnOptionSelect(int optionID)
 	if MantellaMCMcurrentPage =="Main settings"
 		MantellaMCM_MainSettings.OptionUpdate(self,optionID, repository)	
-	elseif MantellaMCMcurrentPage =="Player tracking settings"
-		MantellaMCM_PlayerTrackingSettings.OptionUpdate(self,optionID, repository)	
-	elseif MantellaMCMcurrentPage =="Target tracking settings"
-		MantellaMCM_TargetTrackingSettings.OptionUpdate(self,optionID, repository)	
-	elseif MantellaMCMcurrentPage =="Following NPC settings" ;gia
-		MantellaMCM_FollowingNPCSettings.OptionUpdate(self,optionID, repository)	;gia
+	; elseif MantellaMCMcurrentPage =="Player tracking settings"
+	; 	MantellaMCM_PlayerTrackingSettings.OptionUpdate(self,optionID, repository)	
+	; elseif MantellaMCMcurrentPage =="Target tracking settings"
+	; 	MantellaMCM_TargetTrackingSettings.OptionUpdate(self,optionID, repository)	
+	; elseif MantellaMCMcurrentPage =="Following NPC settings" ;gia
+	; 	MantellaMCM_FollowingNPCSettings.OptionUpdate(self,optionID, repository)	;gia
 	endif
 EndEvent 
 
