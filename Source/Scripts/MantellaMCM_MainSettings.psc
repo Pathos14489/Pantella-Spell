@@ -14,18 +14,17 @@ function LeftColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_keymapMantellaAddToConversationHotkey = mcm.AddKeyMapOption("Start Conversation / Add to Conversation", repository.MantellaAddToConversationHotkey)
     mcm.oid_keymapPromptHotkey = mcm.AddKeyMapOption("Open Text Prompt", repository.MantellaOpenTextInputHotkey)
     mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("End Conversation", repository.MantellaEndHotkey)
-    mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Forget Last Message", repository.MantellaForgetLastMessageHotkey)
-    mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Regen Last Response", repository.MantellaRegenLastMessageHotkey)
+    ; mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Forget Last Message", repository.MantellaForgetLastMessageHotkey) ; commented out until it's implemented
+    ; mcm.oid_keymapEndHotkey = mcm.AddKeyMapOption("Regen Last Response", repository.MantellaRegenLastMessageHotkey)
     mcm.oid_keymapCustomGameEventHotkey = mcm.AddKeyMapOption("Add Custom Game Event", repository.MantellaCustomGameEventHotkey)
     mcm.oid_keymapRadiantHotkey = mcm.AddKeyMapOption("Toggle Radiant Dialogue", repository.MantellaRadiantHotkey) 
     mcm.oid_keymapOpenContextMenuHotkey = mcm.AddKeyMapOption("Open Context Menu", repository.MantellaOpenContextMenuHotkey)
-    mcm.oid_keymapOpenIndividualContextMenuHotkey = mcm.AddKeyMapOption("Open Individual Context Menu", repository.MantellaOpenIndividualContextMenuHotkey)
+    ; mcm.oid_keymapOpenIndividualContextMenuHotkey = mcm.AddKeyMapOption("Open Individual Context Menu", repository.MantellaOpenIndividualContextMenuHotkey)
 
     
     mcm.AddHeaderOption("Settings")
     mcm.oid_responsetimeslider=mcm.AddSliderOption ("Text Response wait time",repository.MantellaEffectResponseTimer)
     mcm.oid_microphoneEnabledToggle=mcm.AddToggleOption("Microphone enabled", Repository.microphoneEnabled)
-    mcm.oid_debugNPCselectMode=mcm.AddToggleOption("NPC Debug Select Mode", Repository.NPCdebugSelectModeEnabled)
 endfunction
 
 function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
@@ -122,9 +121,9 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
         mcm.SetToggleOptionValue(mcm.oid_microphoneEnabledToggle, Repository.microphoneEnabled)
         MiscUtil.WriteToFile("_pantella_microphone_enabled.txt", Repository.microphoneEnabled,  append=false)
         debug.MessageBox("Please restart Pantella and start a new conversation for this option to take effect")
-    elseIf optionID == mcm.oid_debugNPCselectMode
-        Repository.NPCdebugSelectModeEnabled =! Repository.NPCdebugSelectModeEnabled
-        mcm.SetToggleOptionValue(mcm.oid_debugNPCselectMode, Repository.NPCdebugSelectModeEnabled)
+    ; elseIf optionID == mcm.oid_debugNPCselectMode
+    ;     Repository.NPCdebugSelectModeEnabled =! Repository.NPCdebugSelectModeEnabled
+    ;     mcm.SetToggleOptionValue(mcm.oid_debugNPCselectMode, Repository.NPCdebugSelectModeEnabled)
     elseIf optionID == mcm.oid_radiantenabled
         repository.radiantEnabled =! repository.radiantEnabled
         mcm.SetToggleOptionValue(mcm.oid_radiantenabled, repository.radiantEnabled)

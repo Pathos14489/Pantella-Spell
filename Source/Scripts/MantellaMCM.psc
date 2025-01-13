@@ -14,7 +14,7 @@ int property oid_keymapMantellaAddToConversationHotkey auto
 int property oid_keymapEndHotkey auto
 int property oid_keymapCustomGameEventHotkey auto
 int property oid_microphoneEnabledToggle auto
-int property oid_debugNPCSelectMode auto
+; int property oid_debugNPCSelectMode auto
 int property oid_keymapRadiantHotkey auto
 int property oid_keymapOpenContextMenuHotkey auto
 int property oid_keymapOpenIndividualContextMenuHotkey auto
@@ -152,8 +152,8 @@ Event OnOptionHighlight (Int optionID)
 		SetInfoText("This allows the player to enter a game event through text using the hotkey. For example, typing 'The house is on fire' will send that information to the AI")
 	elseIf optionID ==oid_microphoneEnabledToggle	
 		SetInfoText("This turn ON/OFF the microphone input for Pantella (requires Pantella restart)")
-	elseIf optionID ==oid_debugNPCSelectMode	
-		SetInfoText("This allows the player to speak to any NPC by initiating a conversation then entering the actor RefID then the actor name that the player wishes to speak to")	
+	; elseIf optionID ==oid_debugNPCSelectMode	
+	; 	SetInfoText("This allows the player to speak to any NPC by initiating a conversation then entering the actor RefID then the actor name that the player wishes to speak to")	
 	elseIf optionID ==oid_keymapRadiantHotkey
 		SetInfoText("This allows the player to toggle the Pantella Radiant effect on and off with a hotkey.")
 	elseIf optionID ==oid_keymapOpenContextMenuHotkey

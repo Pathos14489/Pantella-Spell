@@ -110,10 +110,10 @@ event OnInit()
 
     ;variables below used by MCM_MainSettings
     MantellaEffectResponseTimer = 180
-    microphoneEnabled = true
+    microphoneEnabled = false
     String microphoneEnabledString = MiscUtil.ReadFromFile("_pantella_microphone_enabled.txt") as String
-    if microphoneEnabledString == "false"
-        microphoneEnabled = false
+    if microphoneEnabledString == "true"
+        microphoneEnabled = true
     endif
     radiantEnabled = false
     radiantDistance = 20
