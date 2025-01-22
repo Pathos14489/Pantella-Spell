@@ -361,17 +361,25 @@ function ConversationLoop(Actor target, Actor caster, String targetName, String 
     endIf
 endFunction
 
-Bool function PythonActorMethodCall(Actor caster, Actor target, String casterName, String targetName, String actorRelationship, String methodName, String argsString)
+function PythonActorMethodCall(Actor caster, Actor target, String casterName, String targetName, String actorRelationship, String methodName, String argsString)
     Debug.Notification("Calling " + methodName + " on " + targetName)
     Debug.Notification("Args: " + argsString)
     String[] args = PapyrusUtil.StringSplit(argsString, "<>")
+    int eid = ModEvent.Create("PantellaBehaviorCall")
+    if (eid) 
+        Debug.Trace("Sending ModEvent for " + methodName + " on " + targetName + " with args: " + argsString + ". EID: " + eid as String)
+        ModEvent.PushForm(eid, caster as Form)
+        ModEvent.PushForm(eid, target as Form)
+        ModEvent.PushString(eid, methodName)
+        ModEvent.PushString(eid, argsString)
+        ModEvent.Send(eid)
+    endIf
     If methodName == "StartCombat"
         if args.Length == 1
             Debug.Notification(casterName + " is starting combat with " + targetName)
             target.StartCombat(caster)
         else
             Debug.Notification("Invalid number of arguments for StartCombat")
-            return false
         endIf
     elseIf methodName == "StopCombat"
         Debug.Notification(targetName + " is stopping combat.")
@@ -414,7 +422,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             target.SetRelationshipRank(PlayerRef, args[0] as int)
         else
             Debug.Notification("Invalid number of arguments for SetPlayerRelationshipRank")
-            return false
         endIf
     elseIf methodName == "Wait"
         if args.Length == 1
@@ -422,7 +429,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             Utility.Wait(args[0] as float)
         else
             Debug.Notification("Invalid number of arguments for Wait")
-            return false
         endIf
     elseIf methodName == "OpenGiftMenu"
         Debug.Notification("Opening gift menu with " + targetName)
@@ -468,7 +474,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             endIf
         else
             Debug.Notification("Invalid number of arguments for ModNonViolentCrime")
-            return false
         endIf
     elseIf methodName == "ModViolentCrime"
         Debug.Notification("Modifying violent crime")
@@ -480,7 +485,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             endIf
         else
             Debug.Notification("Invalid number of arguments for ModViolentCrime")
-            return false
         endIf
     elseIf methodName == "PlayerResistingArrest"
         Debug.Notification("Player is resisting arrest")
@@ -491,7 +495,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             target.ForceActorValue(args[0] as String, args[1] as float)
         else
             Debug.Notification("Invalid number of arguments for ForceActorValue")
-            return false
         endIf
     elseIf methodName == "ModActorValue" || methodName == "ModAV"
         if args.Length == 2
@@ -499,7 +502,6 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
             target.ModActorValue(args[0] as String, args[1] as float)
         else
             Debug.Notification("Invalid number of arguments for ModActorValue")
-            return false
         endIf
     elseIf methodName == "Bribe"
         Debug.Notification("Bribing " + targetName)
@@ -560,11 +562,7 @@ Bool function PythonActorMethodCall(Actor caster, Actor target, String casterNam
         target.UnlockOwnedDoorsInCell()
     elseIf methodName == "PrintLog"
         Debug.Notification(target.GetDisplayName() + ":" + args[0])
-    else
-        Debug.Notification("Invalid method name: " + methodName)
-        return false
     endIf
-    return true
 endfunction
 
 function Update(Actor target, Actor caster)

@@ -39,6 +39,7 @@ Event OnPlayerLoadGame()
     MiscUtil.WriteToFile("_pantella_player_name.txt", playerName, append=false)
     MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)
     MiscUtil.WriteToFile("_pantella_player_gender.txt", playerGender, append=false)
+    MiscUtil.WriteToFile("_pantella_in_game_events.txt", "", append=false) ; Clear the game events file on load from last session
     
 	MantellaMCM_MainSettings.ForceEndAllConversations(repository) ; Clean up any lingering conversations on load
 
