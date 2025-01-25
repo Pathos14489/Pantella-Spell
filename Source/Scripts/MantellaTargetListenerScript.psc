@@ -7,11 +7,11 @@ Event OnItemAdded(Form akBaseItem, int aiItemCount, ObjectReference akItemRefere
     if repository.targetTrackingItemAdded 
         String selfName = self.GetActorReference().getdisplayname()
         string itemName = akBaseItem.GetName()
-        string itemPickedUpMessage = selfName+" picked up " + itemName + ".\n"
+        string itemPickedUpMessage = "npc<OnItemAdded>|name="+selfName+"|item="+itemName+"\n"
         string sourceName = akSourceContainer.getbaseobject().getname()
         if itemName != "Iron Arrow" && itemName != "" ;Papyrus hallucinates iron arrows
             if sourceName != ""
-                itemPickedUpMessage = "npc<OnItemAdded>|name="+selfName+"|item="+itemName+"|source="+sourceName+"\n"
+                itemPickedUpMessage = "npc<OnItemAddedFromDestination>|name="+selfName+"|item="+itemName+"|source="+sourceName+"\n"
             endIf
             ;Debug.Notification(itemPickedUpMessage)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", itemPickedUpMessage)

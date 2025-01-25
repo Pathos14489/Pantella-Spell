@@ -92,58 +92,19 @@ event OnEffectStart(Actor target, Actor caster)
             ; get actor's RefID
             String actorRefId = target.getformid() ; get actor's RefID as int
             
-            if repository.NPCdebugSelectModeEnabled==true ; if debug select mode is active this will allow the user to enter in the RefID of the NPC bio/voice to have a conversation with
-                Debug.Messagebox("Enter the actor's RefID(in base 10) that you wish to speak to") ; TODO: Support BaseID input for debug select mode
-                Utility.Wait(0.1)
-                UIExtensions.InitMenu("UITextEntryMenu")
-                UIExtensions.OpenMenu("UITextEntryMenu")
-                string result1 = UIExtensions.GetMenuResultString("UITextEntryMenu")
-                MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", result1, append=false)
-                
-                Debug.Messagebox("Enter the actor's BaseID(in base 10) that you wish to speak to") ; TODO: Support BaseID input for debug select mode
-                Utility.Wait(0.1)
-                UIExtensions.InitMenu("UITextEntryMenu")
-                UIExtensions.OpenMenu("UITextEntryMenu")
-                string result2 = UIExtensions.GetMenuResultString("UITextEntryMenu")
-                MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", result1, append=false)
-                MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", result2, append=false)
-                
-                Debug.Messagebox("Enter the name of the actor that you wish to speak to")
-                Utility.Wait(0.1)
-                UIExtensions.InitMenu("UITextEntryMenu")
-                UIExtensions.OpenMenu("UITextEntryMenu")
-                string result3 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;get actor name from user input
-                MiscUtil.WriteToFile("_pantella_current_actor.txt", result3, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
-                MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+result3+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
-
-                Debug.Notification("Enter the race of the actor that you wish to speak to")
-                Utility.Wait(0.1)
-                UIExtensions.InitMenu("UITextEntryMenu")
-                UIExtensions.OpenMenu("UITextEntryMenu")
-                string result4 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;
-                MiscUtil.WriteToFile("_pantella_current_actor_race.txt", result4, append=false)
-
-                Debug.Notification("Enter the gender of the actor that you wish to speak to")
-                Utility.Wait(0.1)
-                UIExtensions.InitMenu("UITextEntryMenu")
-                UIExtensions.OpenMenu("UITextEntryMenu")
-                string result5 = UIExtensions.GetMenuResultString("UITextEntryMenu") ;
-                MiscUtil.WriteToFile("__pantella_current_actor_gender.txt", result5, append=false)
-            else ; if debug select mode is not active, use the actor's RefID as the ID to have a conversation with
-                MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", actorRefId, append=false)
-                MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", actorBaseId, append=false)
-                MiscUtil.WriteToFile("_pantella_current_actor.txt", targetName, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
-                MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
-                MiscUtil.WriteToFile("_pantella_current_actor_race.txt", target.GetRace().GetName(), append=false)
-                Int genderID = target.GetActorBase().GetSex() ; Should I use GetLeveledActorBase instead...?
-                String gender = ""
-                if (genderID == 0)
-                    gender = "Male"
-                else
-                    gender = "Female"
-                endIf
-                MiscUtil.WriteToFile("_pantella_current_actor_gender.txt", gender, append=false)
+            MiscUtil.WriteToFile("_pantella_current_actor_base_id.txt", actorBaseId, append=false)
+            MiscUtil.WriteToFile("_pantella_current_actor_ref_id.txt", actorRefId, append=false)
+            MiscUtil.WriteToFile("_pantella_current_actor.txt", targetName, append=false) ;save actor name to _pantella_current_actor.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_active_actors.txt", " "+targetName+" ", append=true) ;add actor name to _pantella_active_actors.txt for Python to read
+            MiscUtil.WriteToFile("_pantella_current_actor_race.txt", target.GetRace().GetName(), append=false)
+            Int genderID = target.GetActorBase().GetSex() ; Should I use GetLeveledActorBase instead...?
+            String gender = ""
+            if (genderID == 0)
+                gender = "Male"
+            else
+                gender = "Female"
             endIf
+            MiscUtil.WriteToFile("_pantella_current_actor_gender.txt", gender, append=false)
             MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false) ;disable character selection mode after first actor is selected
 
             target.addtofaction(repository.giafac_Mantella);gia 
@@ -155,11 +116,13 @@ event OnEffectStart(Actor target, Actor caster)
             MiscUtil.WriteToFile("_pantella_actor_voice.txt", actorVoiceType, append=false)
 
             String currLoc = (caster.GetCurrentLocation() as form).getname()
-
             if currLoc == ""
                 currLoc = "Skyrim"
             endIf
+
             MiscUtil.WriteToFile("_pantella_current_location.txt", currLoc, append=false)
+
+            ParseMethodCalls(target, caster) ; check for any methods to call on the actor
 
             Update(target, caster) ; update time to be used for the time of day in the conversation
             String actorRelationship = target.GetRelationshipRank(PlayerRef)
@@ -260,114 +223,48 @@ event OnEffectStart(Actor target, Actor caster)
     endIf
 endEvent
 
-
-function MainConversationLoop(Actor target, Actor caster, String targetName, String casterName, String actorRelationship, Int loopCount) ; this function is for the first actor selected in a conversation
-    ; Debug.Notification("MainConversationLoop")
-    String sayLine = MiscUtil.ReadFromFile("_pantella_say_line.txt") as String
-    String playerLightLevel = PlayerRef.GetLightLevel()
-    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
-    if sayLine != "False" ; if there is a line to say
-        Debug.Notification(targetName + " is speaking.")
-        MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
-        target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
-        target.SetLookAt(caster)
-
-        ; Set sayLine back to False once the voiceline has been triggered
-        MiscUtil.WriteToFile("_pantella_say_line.txt", "False",  append=false)
-        localMenuTimer = -1
-; 
-        ; Debug.Notification("Checking for actor methods")
-
-        ; Check every line of _pantella_actor_methods for the following format: "refID|methodName|args" with the args section being optional, and "<>" separated. Every line that matches this format will be removed and the file updated
-        String actorMethods = MiscUtil.ReadFromFile("_pantella_actor_methods.txt") as String
-        String newActorMethods = ""
-        if actorMethods != "" && actorMethods != "False" ; if the file is not empty or False
-            ; Debug.Notification("Found actor" + actorMethodsArray.Length as String + " methods.")
-            ; Debug.Notification("Actor INT ID:" + target.GetFormID() as String)
-            String[] actorMethodsArray = PapyrusUtil.StringSplit(actorMethods, "\n")
-            Int i = 0
-            while i < actorMethodsArray.Length
-                ; Debug.Notification("Parsing Line: " + actorMethodsArray[i])
-                String[] actorMethod = PapyrusUtil.StringSplit(actorMethodsArray[i], "|")
-                int ref_id_int = actorMethod[0] as int
-                if ref_id_int == target.GetFormID() ; if the refID matches the target's refID
-                    Debug.Notification("Calling Method: " + actorMethod[1] + " on " + targetName)
-                    if actorMethod.Length > 2
-                        PythonActorMethodCall(caster, target, casterName, targetName, actorRelationship, actorMethod[1] as String, actorMethod[2] as String)
-                    else
-                        PythonActorMethodCall(caster, target, casterName, targetName, actorRelationship, actorMethod[1] as String, "")
-                    endIf
+function ParseMethodCalls(Actor target, Actor caster)
+    ; Check every line of _pantella_actor_methods for the following format: "refID|methodName|args" with the args section being optional, and "<>" separated. Every line that matches this format will be removed and the file updated
+    String actorMethods = MiscUtil.ReadFromFile("_pantella_actor_methods.txt") as String
+    String newActorMethods = ""
+    if actorMethods != "" && actorMethods != "False" ; if the file is not empty or False
+        ; Debug.Notification("Found actor" + actorMethodsArray.Length as String + " methods.")
+        ; Debug.Notification("Actor INT ID:" + target.GetFormID() as String)
+        String[] actorMethodsArray = PapyrusUtil.StringSplit(actorMethods, "\n")
+        Int i = 0
+        while i < actorMethodsArray.Length
+            ; Debug.Notification("Parsing Line: " + actorMethodsArray[i])
+            String[] actorMethod = PapyrusUtil.StringSplit(actorMethodsArray[i], "|")
+            int ref_id_int = actorMethod[0] as int
+            if ref_id_int == target.GetFormID() ; if the refID matches the target's refID
+                if actorMethod.Length > 2
+                    PythonActorMethodCall(caster, target, actorMethod[1] as String, actorMethod[2] as String)
                 else
-                    newActorMethods += actorMethodsArray[i] + "\n"
+                    PythonActorMethodCall(caster, target, actorMethod[1] as String, "")
                 endIf
-                i += 1
-            endwhile
-            MiscUtil.WriteToFile("_pantella_actor_methods.txt", newActorMethods,  append=false)
-        endIf
-        
-        Update(target, caster)
-
-        caster.SetLookAt(target)
-    endIf
-
-    ; Run these checks every 5 loops
-    if loopCount % 5 == 0
-        String status = MiscUtil.ReadFromFile("_pantella_status.txt") as String
-        if status != "False"
-            Debug.Notification(status)
-            MiscUtil.WriteToFile("_pantella_status.txt", "False",  append=false)
-        endIf
-
-        String playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String
-        if playerResponse == "True"
-            StartTimer()
-            Utility.Wait(2)
-        endIf
-
-        if loopCount % 20 == 0
-            target.ClearLookAt()
-            caster.ClearLookAt()
-            String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
-            if radiantDialogue == "True"
-                float distanceBetweenActors = caster.GetDistance(target)
-                float distanceToPlayer = ConvertGameUnitsToMeter(caster.GetDistance(PlayerRef))
-                ;Debug.Notification(distanceBetweenActors)
-                ;TODO: allow distanceBetweenActos limit to be customisable
-                if (distanceBetweenActors > 1500) || (distanceToPlayer > repository.radiantDistance) || (caster.GetCurrentLocation() != target.GetCurrentLocation()) || (caster.GetCurrentScene() != None) || (target.GetCurrentScene() != None)
-                    ;Debug.Notification(distanceBetweenActors)
-                    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
-                endIf
+            else
+                newActorMethods += actorMethodsArray[i] + "\n"
             endIf
-        endIf
+            i += 1
+        endwhile
+        MiscUtil.WriteToFile("_pantella_actor_methods.txt", newActorMethods,  append=false)
     endIf
 endFunction
 
-function ConversationLoop(Actor target, Actor caster, String targetName, String casterName, String sayLineFile) ; this function is for all actors selected after the first actor in a conversation
-    ; Debug.Notification("ConversationLoop")
-    String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
-    String playerLightLevel = PlayerRef.GetLightLevel()
-    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
-    if sayLine != "False"
-        Debug.Notification(targetName + " is speaking.")
-        ; Debug.Notification(sayLine)
-        ; Debug.Notification(sayLineFile)
-        MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
-        target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
-        target.SetLookAt(caster)
+function PythonActorMethodCall(Actor caster, Actor target, String methodName, String argsString)
+    String targetName = target.getdisplayname()
+    String casterName = caster.getdisplayname()
 
-        ; Set sayLine back to False once the voiceline has been triggered
-        MiscUtil.WriteToFile(sayLineFile, "False",  append=false)
-        localMenuTimer = -1
+    if (casterName == targetName) ; TODO: only handles case when conversation includes 2 actors with the same name. Would like to handle case when an arbitrary number of actors with the same name are in the conversation
+        casterName = casterName + " 1"
+        targetName = targetName + " 2"
     endIf
-endFunction
-
-function PythonActorMethodCall(Actor caster, Actor target, String casterName, String targetName, String actorRelationship, String methodName, String argsString)
-    Debug.Notification("Calling " + methodName + " on " + targetName)
-    Debug.Notification("Args: " + argsString)
+    Debug.Notification("Calling '" + methodName + "' on " + targetName)
+    ; Debug.Notification("Args: " + argsString)
     String[] args = PapyrusUtil.StringSplit(argsString, "<>")
     int eid = ModEvent.Create("PantellaBehaviorCall")
     if (eid) 
-        Debug.Trace("Sending ModEvent for " + methodName + " on " + targetName + " with args: " + argsString + ". EID: " + eid as String)
+        ; Debug.Trace("Sending ModEvent for " + methodName + " on " + targetName + " with args: " + argsString + ". EID: " + eid as String)
         ModEvent.PushForm(eid, caster as Form)
         ModEvent.PushForm(eid, target as Form)
         ModEvent.PushString(eid, methodName)
@@ -376,7 +273,7 @@ function PythonActorMethodCall(Actor caster, Actor target, String casterName, St
     endIf
     If methodName == "StartCombat"
         if args.Length == 1
-            Debug.Notification(casterName + " is starting combat with " + targetName)
+            Debug.Notification(targetName + " is starting combat with " + casterName)
             target.StartCombat(caster)
         else
             Debug.Notification("Invalid number of arguments for StartCombat")
@@ -565,6 +462,81 @@ function PythonActorMethodCall(Actor caster, Actor target, String casterName, St
     endIf
 endfunction
 
+function MainConversationLoop(Actor target, Actor caster, String targetName, String casterName, String actorRelationship, Int loopCount) ; this function is for the first actor selected in a conversation
+    ; Debug.Notification("MainConversationLoop")
+    String sayLine = MiscUtil.ReadFromFile("_pantella_say_line.txt") as String
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
+    
+    ParseMethodCalls(target, caster)
+
+    if sayLine != "False" ; if there is a line to say
+        Debug.Notification(targetName + " is speaking.")
+        MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
+        target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
+        target.SetLookAt(caster)
+
+        ; Set sayLine back to False once the voiceline has been triggered
+        MiscUtil.WriteToFile("_pantella_say_line.txt", "False",  append=false)
+        localMenuTimer = -1
+        ; Debug.Notification("Checking for actor methods")
+        
+        Update(target, caster)
+
+        caster.SetLookAt(target)
+    endIf
+
+    ; Run these checks every 5 loops
+    if loopCount % 5 == 0
+        String status = MiscUtil.ReadFromFile("_pantella_status.txt") as String
+        if status != "False"
+            Debug.Notification(status)
+            MiscUtil.WriteToFile("_pantella_status.txt", "False",  append=false)
+        endIf
+
+        String playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String
+        if playerResponse == "True"
+            StartTimer()
+            Utility.Wait(2)
+        endIf
+
+        if loopCount % 20 == 0
+            target.ClearLookAt()
+            caster.ClearLookAt()
+            String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
+            if radiantDialogue == "True"
+                float distanceBetweenActors = caster.GetDistance(target)
+                float distanceToPlayer = ConvertGameUnitsToMeter(caster.GetDistance(PlayerRef))
+                ;Debug.Notification(distanceBetweenActors)
+                ;TODO: allow distanceBetweenActos limit to be customisable
+                if (distanceBetweenActors > 1500) || (distanceToPlayer > repository.radiantDistance) || (caster.GetCurrentLocation() != target.GetCurrentLocation()) || (caster.GetCurrentScene() != None) || (target.GetCurrentScene() != None)
+                    ;Debug.Notification(distanceBetweenActors)
+                    MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)
+                endIf
+            endIf
+        endIf
+    endIf
+endFunction
+
+function ConversationLoop(Actor target, Actor caster, String targetName, String casterName, String sayLineFile) ; this function is for all actors selected after the first actor in a conversation
+    ; Debug.Notification("ConversationLoop")
+    String sayLine = MiscUtil.ReadFromFile(sayLineFile) as String
+    String playerLightLevel = PlayerRef.GetLightLevel()
+    MiscUtil.WriteToFile("_pantella_player_light_level.txt", playerLightLevel, append=false)
+    if sayLine != "False"
+        Debug.Notification(targetName + " is speaking.")
+        ; Debug.Notification(sayLine)
+        ; Debug.Notification(sayLineFile)
+        MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(target, MantellaDialogueLine, sayLine)
+        target.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
+        target.SetLookAt(caster)
+
+        ; Set sayLine back to False once the voiceline has been triggered
+        MiscUtil.WriteToFile(sayLineFile, "False",  append=false)
+        localMenuTimer = -1
+    endIf
+endFunction
+
 function Update(Actor target, Actor caster)
     String playerIsArrested = PlayerRef.IsArrested()
     MiscUtil.WriteToFile("_pantella_player_is_arrested.txt", playerIsArrested, append=false)
@@ -666,9 +638,7 @@ endFunction
 
 function StartTimer()
 	localMenuTimer=180
-    ;#################################################
 	localMenuTimer = repository.MantellaEffectResponseTimer
-    ;################################################
     int localMenuTimerInt = Math.Floor(localMenuTimer)
 	Debug.Notification("Awaiting player input for "+localMenuTimerInt+" seconds")
 	String Monitorplayerresponse
@@ -712,8 +682,8 @@ function GetPlayerInput()
     UIExtensions.OpenMenu("UITextEntryMenu")
 
     string result = UIExtensions.GetMenuResultString("UITextEntryMenu")
-    MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(PlayerRef, MantellaDialogueLine, result)
-    PlayerRef.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
+    ; MantellaSubtitles.SetInjectTopicAndSubtitleForSpeaker(PlayerRef, MantellaDialogueLine, result) ; Doesn't do anything I don't think.
+    ; PlayerRef.Say(MantellaDialogueLine, abSpeakInPlayersHead=false)
 
     MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
     MiscUtil.WriteToFile("_pantella_text_input.txt", result, append=false)
