@@ -36,7 +36,7 @@ function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
     mcm.oid_radiantfrequency = mcm.AddSliderOption("Trigger Frequency",repository.radiantFrequency)
 
     mcm.AddHeaderOption("Debug")
-    mcm.oid_endFlagMantellaConversationAll=mcm.AddToggleOption("End All Conversations (Fix Repeating NPCs)", Repository.endFlagMantellaConversationAll)
+    mcm.oid_endFlagMantellaConversationAll = mcm.AddToggleOption("End All Conversations (Fix Repeating NPCs)", Repository.endFlagMantellaConversationAll)
 endfunction
 
 function SliderOptionOpen(MantellaMCM mcm, int optionID, MantellaRepository Repository) global
@@ -113,6 +113,7 @@ function KeyMapChange(MantellaMCM mcm,Int option, Int keyCode, String conflictCo
 endfunction
 
 function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Repository) global
+    debug.Notification("OptionID: " + optionID)
     ;checks option per option what the toggle is and the updates the variable/function repository MantellaRepository so the MantellaEffect and Repository Hotkey function can access it
     if optionID == mcm.oid_microphoneEnabledToggle
         Repository.microphoneEnabled =! Repository.microphoneEnabled
@@ -143,7 +144,7 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
         endif
     elseif optionID==mcm.oid_endFlagMantellaConversationAll
         Repository.endFlagMantellaConversationAll=!Repository.endFlagMantellaConversationAll
-        mcm.SetToggleOptionValue( mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
+        mcm.SetToggleOptionValue(mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
         debug.messagebox("Terminating all conversations, close this menu for the change to take effect.")
     endif
 endfunction
@@ -153,7 +154,7 @@ function EndAllConversations(MantellaMCM mcm,MantellaRepository Repository) glob
     Utility.wait(0.5)
     repository.endFlagMantellaConversationAll = false
     mcm.SetToggleOptionValue(mcm.oid_endFlagMantellaConversationAll, Repository.endFlagMantellaConversationAll)
-    debug.messagebox("All ongoing conversations terminated. Restart Pantella. The next conversation might need to be started twice.")
+    debug.messagebox("All ongoing conversations terminated. Restart Pantella if the conversation is still ongoing in the terminal. The next conversation might need to be started twice.")
 Endfunction
 function ForceEndAllConversations(MantellaRepository Repository) global ; Quietly ends all conversations
     MiscUtil.WriteToFile("_pantella_end_conversation.txt", "True",  append=false)

@@ -236,7 +236,7 @@ endEvent
 
 Event OnConfigClose ()
     {Used to terminate all conversations}
-    If 	repository.endFlagMantellaConversationAll == true
+    If repository.endFlagMantellaConversationAll == true
 		MantellaMCM_MainSettings.EndAllConversations(self, repository)
 	EndIf
 EndEvent

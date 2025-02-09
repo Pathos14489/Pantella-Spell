@@ -40,6 +40,8 @@ Event OnPlayerLoadGame()
     MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)
     MiscUtil.WriteToFile("_pantella_player_gender.txt", playerGender, append=false)
     MiscUtil.WriteToFile("_pantella_in_game_events.txt", "", append=false) ; Clear the game events file on load from last session
+    MiscUtil.WriteToFile("_pantella_actor_count.txt", "0", append=false)
+    MiscUtil.WriteToFile("_pantella_character_selection.txt", "True", append=false)
     
 	MantellaMCM_MainSettings.ForceEndAllConversations(repository) ; Clean up any lingering conversations on load
 
@@ -63,47 +65,59 @@ event OnRaceSwitchComplete()
 EndEvent
 
 event OnUpdate()
+    Debug.Notification("Checking for radiant conversations...")
     if repository.radiantEnabled
+        Debug.Notification("Checking for nearby actors...")
         String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String
         ; if no Mantella conversation active
+        Debug.Notification("Active actors: " + activeActors)
         if activeActors == ""
             ;MantellaActorList taken from this tutorial:
             ;http://skyrimmw.weebly.com/skyrim-modding/detecting-nearby-actors-skyrim-modding-tutorial
             MantellaActorList.start()
-
+            Debug.Notification("Querying for nearby actors...")
             ; if both actors found
             if (PotentialActor1.GetReference() as Actor) && (PotentialActor2.GetReference() as Actor)
+                Debug.Notification("Found two actors nearby.")
                 Actor Actor1 = PotentialActor1.GetReference() as Actor
                 Actor Actor2 = PotentialActor2.GetReference() as Actor
+                String Actor1Name = Actor1.getdisplayname()
+                String Actor2Name = Actor2.getdisplayname()
+                Debug.Notification("Actor 1: " + Actor1Name)
+                Debug.Notification("Actor 2: " + Actor2Name)
 
                 float distanceToClosestActor = game.getplayer().GetDistance(Actor1)
+                Debug.Notification("Distance to closest actor: " + ConvertGameUnitsToMeter(distanceToClosestActor) + " meters")
                 float maxDistance = ConvertMeterToGameUnits(repository.radiantDistance)
                 if distanceToClosestActor <= maxDistance
-                    String Actor1Name = Actor1.getdisplayname()
-                    String Actor2Name = Actor2.getdisplayname()
                     float distanceBetweenActors = Actor1.GetDistance(Actor2)
+
+                    Debug.Notification("Distance between actors: " + ConvertGameUnitsToMeter(distanceBetweenActors) + " meters")
 
                     ;TODO: make distanceBetweenActors customisable
                     if (distanceBetweenActors <= 1000)
                         MiscUtil.WriteToFile("_pantella_radiant_dialogue.txt", "True", append=false)
 
+                        Debug.Notification("Cast spell on Actor 1 by Actor 2")
                         ;have spell casted on Actor 1 by Actor 2
-                        MantellaSpell.Cast(Actor2 as ObjectReference, Actor1 as ObjectReference)
+                        MantellaSpell.Cast(PotentialActor2.GetReference() as ObjectReference, PotentialActor1.GetReference() as ObjectReference)
 
-                        MiscUtil.WriteToFile("_pantella_character_selected.txt", "False", append=false)
+                        ; MiscUtil.WriteToFile("_pantella_character_selected.txt", "False", append=false)
 
-                        String character_selected = "False"
-                        ;wait for the Mantella spell to give the green light that it is ready to load another actor
-                        while character_selected == "False"
-                            character_selected = MiscUtil.ReadFromFile("_pantella_character_selected.txt") as String
-                        endWhile
+                        ; String character_selected = "False"
+                        ; while character_selected == "False" 
+                        ;     character_selected = MiscUtil.ReadFromFile("_pantella_character_selected.txt") as String
+                        ; endWhile
+                        Utility.Wait(0.5)
 
+                        Debug.Notification("Waiting for character selection confirmation...")
                         String character_selection_enabled = "False"
-                        while character_selection_enabled == "False"
+                        while character_selection_enabled == "False" ; wait for the Mantella spell to give the green light that it is ready to load another actor
                             character_selection_enabled = MiscUtil.ReadFromFile("_pantella_character_selection.txt") as String
                         endWhile
 
-                        MantellaSpell.Cast(Actor1 as ObjectReference, Actor2 as ObjectReference)
+                        Debug.Notification("Cast spell on Actor 2 by Actor 1")
+                        MantellaSpell.Cast(PotentialActor1.GetReference() as ObjectReference, PotentialActor2.GetReference() as ObjectReference)
                     else
                         ;TODO: make this notification optional
                         Debug.Notification("Radiant dialogue attempted. No NPCs available")
@@ -117,9 +131,11 @@ event OnUpdate()
                 Debug.Notification("Radiant dialogue attempted. No NPCs available")
             endIf
 
+            Debug.Notification("Radiant conversation check complete, setting up for next check in " + repository.radiantFrequency as string + " seconds.")
             MantellaActorList.stop()
         endIf
     endIf
+    Debug.Notification("Radiant conversation check completed.")
     RegisterForSingleUpdate(repository.radiantFrequency)
 endEvent
 
