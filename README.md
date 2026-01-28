@@ -3,7 +3,7 @@
 # Pantella Spell
 > Bring Skyrim NPCs to life with AI
 
-This repository is for the Pantella Spell mod, which handles the Skyrim-side logic of Pantella. For the main Pantella repository, see [here](https://github.com/art-from-the-machine/Mantella).
+This repository is for the Pantella Spell mod, which handles the Skyrim-side logic of Pantella. For the main Pantella repository, see [here](https://github.com/Pathos14489/Pantella).
 
 The source code for the subtitles plugin can be found [here](https://github.com/swwu/Mantella-Subtitles-Plugin-NG).
 
