@@ -1,4 +1,4 @@
-# PantellaNV
+# Pantella Spell
 > Bring Skyrim NPCs to life with AI
 
 <img src="./img/pantella_logo_github.png" align="left" alt="Pantella logo" width="150" height="auto">
