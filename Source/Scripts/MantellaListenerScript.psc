@@ -35,6 +35,14 @@ Event OnPlayerLoadGame()
     else
         playerGender = "Female"
     endIf
+    int papyrusVersion = PapyrusUtil.GetScriptVersion()
+    if (papyrusVersion == 0)
+        Debug.Notification("PapyrusUtil not detected. Pantella recommends PapyrusUtil version 46 or higher. Pantella will not work at all without PapyrusUtil, so please ensure that the latest version of PapyrusUtil is installed!")
+    else
+        if (papyrusVersion < 46) ; PapyrusUtil returns 0 if it can't get the version, which likely means it isn't installed
+            Debug.Notification("Pantella recommends PapyrusUtil version 46 or higher. Some features may not work correctly with older versions. Please ensure that the latest version of PapyrusUtil is installed! Current version detected: " + papyrusVersion)
+        endIf
+    endIf
     String playerName = player.GetActorBase().GetName()
     MiscUtil.WriteToFile("_pantella_player_name.txt", playerName, append=false)
     MiscUtil.WriteToFile("_pantella_player_race.txt", playerRace, append=false)

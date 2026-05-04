@@ -499,7 +499,7 @@ function MainConversationLoop(Actor target, Actor caster, String targetName, Str
         removeArrayIndex += 1
     endwhile
 
-    ParseMethodCalls(target, caster)
+    ParseMethodCalls(target, caster) ; Parse python method calls on the target and caster in the current conversation
 
     if sayLine != "False" ; if there is a line to say
         Debug.Notification(targetName + " is speaking.")
