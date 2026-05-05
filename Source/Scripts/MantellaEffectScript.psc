@@ -5,13 +5,14 @@ ReferenceAlias property TargetRefAlias auto
 Faction Property PlayerFaction Auto
 Actor Property PlayerRef  Auto  
 Faction Property PotentialFollowerFaction Auto
+MantellaRepository property repository auto
 ;gia Faction property DunPlayerAllyFactionProperty auto
 ;gia Faction property PotentialFollowerFactionProperty auto
 
 ;#############
 float localMenuTimer = 0.0
 ;#############
-MantellaRepository property repository auto
+
 String endConversation = "False"
 int actorCount = 0
 
@@ -24,15 +25,20 @@ event OnEffectStart(Actor target, Actor caster)
 	; only run script if actor is not already selected
 	; String currentActor = MiscUtil.ReadFromFile("_pantella_current_actor.txt") as String
 
-    Debug.Notification("MantellaEffectScript OnEffectStart")
+    if repository.showDebugNotifications
+        Debug.Notification("MantellaEffectScript OnEffectStart")
+    endIf
     String character_selection_enabled = MiscUtil.ReadFromFile("_pantella_character_selection.txt") as String
     if (character_selection_enabled == "False")
-        Debug.Notification("MantellaEffectScript OnEffectStart - character selection disabled")
+        if repository.showDebugNotifications
+            Debug.Notification("MantellaEffectScript OnEffectStart - character selection disabled")
+        endIf
         return
     endIf
     MiscUtil.WriteToFile("_pantella_character_selection.txt", "False", append=false)
-    Debug.Notification("MantellaEffectScript OnEffectStart - character selection enabled")
-
+    if repository.showDebugNotifications
+        Debug.Notification("MantellaEffectScript OnEffectStart - character selection enabled")
+    endIf
     PlayerRef = Game.GetPlayer()
     Int playerGenderID = PlayerRef.GetActorBase().GetSex()
     String playerGender = ""
@@ -94,7 +100,9 @@ event OnEffectStart(Actor target, Actor caster)
         endIf
     endIf
     if actorAlreadyLoaded == false ; if actor not already loaded and character selection is enabled
-        Debug.Notification("Attempting to add NPC to conversation...")
+        if repository.showDebugNotifications
+            Debug.Notification("Attempting to add " + targetName + " to conversation...")
+        endIf
         TargetRefAlias.ForceRefTo(target)
         
         ; Write Actor IDs to file for Python to read
@@ -192,7 +200,9 @@ event OnEffectStart(Actor target, Actor caster)
         endConversation = "False"
         String sayFinalLine = "False"
         String sayLineFile = "_pantella_say_line_"+actorCount+".txt"
-        Debug.Notification("sayLineFile: " + sayLineFile)
+        if repository.showDebugNotifications
+            Debug.Notification("sayLineFile: " + sayLineFile)
+        endIf
         Int loopCount = 0
 
         ; Wait for first voiceline to play to avoid old conversation playing
@@ -219,7 +229,7 @@ event OnEffectStart(Actor target, Actor caster)
         endWhile
 
 
-        Debug.Notification("Conversation ended.")
+        ; Debug.Notification("Conversation ended.")
         actorCount = MiscUtil.ReadFromFile("_pantella_actor_count.txt") as int ;get number of actors from _pantella_actor_count.txt from Python
         actorCount -= 1 ; decrement actorCount by 1 to account for the actor that was just added to a conversation
         if actorCount < 0
@@ -276,7 +286,9 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
         casterName = casterName + " 1"
         targetName = targetName + " 2"
     endIf
-    Debug.Notification("Calling '" + methodName + "' on " + targetName)
+    if repository.showDebugNotifications
+        Debug.Notification("Calling '" + methodName + "' on " + targetName)
+    endIf
     ; Debug.Notification("Args: " + argsString)
     String[] args = PapyrusUtil.StringSplit(argsString, "<>")
     int eid = ModEvent.Create("PantellaBehaviorCall")
@@ -293,7 +305,9 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
             Debug.Notification(targetName + " is starting combat with " + casterName)
             target.StartCombat(caster)
         else
-            Debug.Notification("Invalid number of arguments for StartCombat")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for StartCombat")
+            endIf
         endIf
     elseIf methodName == "StopCombat"
         Debug.Notification(targetName + " is stopping combat.")
@@ -332,17 +346,25 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
         target.EvaluatePackage();gia
     elseIf methodName == "SetPlayerRelationshipRank"
         if args.Length == 1
-            Debug.Notification("Setting relationship rank to " + args[0] + " for " + targetName)
+            if repository.showDebugNotifications
+                Debug.Notification("Setting relationship rank to " + args[0] + " for " + targetName)
+            endIf
             target.SetRelationshipRank(PlayerRef, args[0] as int)
         else
-            Debug.Notification("Invalid number of arguments for SetPlayerRelationshipRank")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for SetPlayerRelationshipRank")
+            endIf
         endIf
     elseIf methodName == "Wait"
         if args.Length == 1
-            Debug.Notification("Waiting for " + args[0] + " seconds.")
+            if repository.showDebugNotifications
+                Debug.Notification("Waiting for " + args[0] + " seconds.")
+            endIf
             Utility.Wait(args[0] as float)
         else
-            Debug.Notification("Invalid number of arguments for Wait")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for Wait")
+            endIf
         endIf
     elseIf methodName == "OpenGiftMenu"
         Debug.Notification("Opening gift menu with " + targetName)
@@ -372,14 +394,16 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
         Debug.Notification("Sending assault alarm for player")
         target.SendAssaultAlarm()
     elseIf methodName == "ArrestPlayer"
-        Debug.Notification("Arresting player")
+        Debug.Notification(targetName + " is going to try arresting the player.")
         Faction crime_fac = target.GetCrimeFaction()
         if crime_fac != None
             crime_fac.ModCrimeGold(100, true)
         endIf
         target.SendAssaultAlarm()
     elseIf methodName == "ModNonViolentCrime"
-        Debug.Notification("Modifying non-violent crime")
+        if repository.showDebugNotifications
+            Debug.Notification("Modifying non-violent crime")
+        endIf
         Faction crime_fac = target.GetCrimeFaction()
         if args.Length == 1
             Int crimeGold = args[0] as int
@@ -387,10 +411,14 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
                 crime_fac.ModCrimeGold(crimeGold, false)
             endIf
         else
-            Debug.Notification("Invalid number of arguments for ModNonViolentCrime")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for ModNonViolentCrime")
+            endIf
         endIf
     elseIf methodName == "ModViolentCrime"
-        Debug.Notification("Modifying violent crime")
+        if repository.showDebugNotifications
+            Debug.Notification("Modifying violent crime")
+        endIf
         Faction crime_fac = target.GetCrimeFaction()
         if args.Length == 1
             Int crimeGold = args[0] as int
@@ -398,24 +426,34 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
                 crime_fac.ModCrimeGold(crimeGold, true)
             endIf
         else
-            Debug.Notification("Invalid number of arguments for ModViolentCrime")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for ModViolentCrime")
+            endIf
         endIf
     elseIf methodName == "PlayerResistingArrest"
         Debug.Notification("Player is resisting arrest")
         target.SetPlayerResistingArrest()
     elseIf methodName == "ForceActorValue" || methodName == "ForceAV"
         if args.Length == 2
-            Debug.Notification("Forcing actor value " + args[0] + " to " + args[1] + " for " + targetName)
+            if repository.showDebugNotifications
+                Debug.Notification("Forcing actor value " + args[0] + " to " + args[1] + " for " + targetName)
+            endIf
             target.ForceActorValue(args[0] as String, args[1] as float)
         else
-            Debug.Notification("Invalid number of arguments for ForceActorValue")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for ForceActorValue")
+            endIf
         endIf
     elseIf methodName == "ModActorValue" || methodName == "ModAV"
         if args.Length == 2
-            Debug.Notification("Modifying actor value " + args[0] + " by " + args[1] + " for " + targetName)
+            if repository.showDebugNotifications
+                Debug.Notification("Modifying actor value " + args[0] + " by " + args[1] + " for " + targetName)
+            endIf
             target.ModActorValue(args[0] as String, args[1] as float)
         else
-            Debug.Notification("Invalid number of arguments for ModActorValue")
+            if repository.showDebugNotifications
+                Debug.Notification("Invalid number of arguments for ModActorValue")
+            endIf
         endIf
     elseIf methodName == "Bribe"
         Debug.Notification("Bribing " + targetName)
@@ -430,7 +468,9 @@ function PythonActorMethodCall(Actor caster, Actor target, String methodName, St
         Debug.Notification("Waking up " + targetName)
         target.SetUnconscious(false)
     elseIf methodName == "Kill"
-        Debug.Notification("Killing " + targetName)
+        if repository.showDebugNotifications
+            Debug.Notification("Killing " + targetName)
+        endif
         target.Kill()
     elseIf methodName == "EnableAI"
         Debug.Notification("Enabling AI for " + targetName)

@@ -64,8 +64,10 @@ int property MantellaOpenTextInputHotkey auto
 int property MantellaAddToConversationHotkey auto
 int property MantellaCustomGameEventHotkey auto
 bool property microphoneEnabled auto
+bool property showDebugNotifications auto
 bool property NPCdebugSelectModeEnabled auto
 bool property endFlagMantellaConversationAll auto
+bool property pantellaInitialized auto
 
 string property context_string auto
 int property MantellaOpenContextMenuHotkey auto
@@ -87,6 +89,7 @@ event OnInit()
     playerTrackingOnFastTravelEnd = true
     playerTrackingOnVampirismStateChanged = true
     playerTrackingOnLycanthropyStateChanged = true
+    pantellaInitialized = false
     
 
     ;variables below used by MCM_TargetTrackingSettings
@@ -115,6 +118,7 @@ event OnInit()
     ; if microphoneEnabledString == "true"
     ;     microphoneEnabled = true
     ; endif
+    showDebugNotifications = false
     radiantEnabled = false
     radiantDistance = 20
     radiantFrequency = 10
@@ -211,6 +215,10 @@ Event OnKeyDown(int KeyCode)
 	;this ensures the right key is pressed and only activated while not in menu mode
     if !utility.IsInMenuMode()
         if KeyCode == MantellaOpenTextInputHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             String playerResponse = "False"
             playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
             
@@ -226,6 +234,10 @@ Event OnKeyDown(int KeyCode)
                 endif
             endif
         elseif KeyCode == MantellaAddToConversationHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             String radiantDialogue = MiscUtil.ReadFromFile("_pantella_radiant_dialogue.txt") as String
             String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String ; This is a list of all the actors that are currently loaded into the Mantella
             Actor targetRef = (Game.GetCurrentCrosshairRef() as actor) ; this is the actor that the player is looking at when the hotkey is pressed - If the player is not looking at an actor, this will be None
@@ -243,18 +255,34 @@ Event OnKeyDown(int KeyCode)
                 endif
             endif
         elseif KeyCode == MantellaEndHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
             MiscUtil.WriteToFile("_pantella_text_input.txt", "EndConversationNow", append=false)
             Debug.Notification("Ending Conversation")
         elseif KeyCode == MantellaForgetLastMessageHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
             MiscUtil.WriteToFile("_pantella_text_input.txt", "ForgetLastMessage", append=false)
             Debug.Notification("Forgetting Last Message")
         elseif KeyCode == MantellaRegenLastMessageHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             MiscUtil.WriteToFile("_pantella_text_input_enabled.txt", "False", append=False)
             MiscUtil.WriteToFile("_pantella_text_input.txt", "RegenLastMessage", append=false)
             Debug.Notification("Regenerating Last Response...")
         elseif KeyCode == MantellaCustomGameEventHotkey 
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.OpenMenu("UITextEntryMenu")
             string gameEventEntry = UIExtensions.GetMenuResultString("UITextEntryMenu")
@@ -262,6 +290,10 @@ Event OnKeyDown(int KeyCode)
             MiscUtil.WriteToFile("_pantella_in_game_events.txt", gameEventEntry)
             ; endFlagMantellaConversationAll = false
         elseif KeyCode == MantellaRadiantHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             radiantEnabled =! radiantEnabled
             if radiantEnabled == True
                 Debug.Notification("Radiant Dialogue Enabled")
@@ -269,6 +301,10 @@ Event OnKeyDown(int KeyCode)
                 Debug.Notification("Radiant Dialogue Disabled")
             endif
         elseif KeyCode == MantellaOpenContextMenuHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             Debug.Notification("Opening Context Menu with String: "+context_string)
             UIExtensions.InitMenu("UITextEntryMenu")
             UIExtensions.SetMenuPropertyString("UITextEntryMenu", "text", context_string)
@@ -278,6 +314,10 @@ Event OnKeyDown(int KeyCode)
             context_string = contextString
             MiscUtil.WriteToFile("_pantella_context_string.txt", contextString, append=false)
         elseif KeyCode == MantellaOpenIndividualContextMenuHotkey
+            if pantellaInitialized == false
+                Debug.Notification("Pantella is not initialized yet. Please save and reload your save to initialize Pantella.")
+                return
+            endif
             String playerResponse = "False"
             playerResponse = MiscUtil.ReadFromFile("_pantella_text_input_enabled.txt") as String ;Checks if the Mantella is ready for text input and if the MCM has the microphone disabled
             

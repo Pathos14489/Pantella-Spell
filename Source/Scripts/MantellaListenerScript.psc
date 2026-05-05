@@ -9,10 +9,10 @@ ReferenceAlias Property PotentialActor2  Auto
 
 event OnInit()
     Game.GetPlayer().AddSpell(MantellaSpell)
-    Game.GetPlayer().AddSpell(MantellaPower);gia
+    Game.GetPlayer().AddSpell(MantellaPower) ; gia
     Debug.Notification("Pantella Spell added.")
     Debug.Notification("Pantella Hotkey is " + repository.MantellaCustomGameEventHotkey)
-    Debug.Notification("IMPORTANT: Please save and reload to activate Pantella.")
+    Debug.MessageBox("IMPORTANT: Please save and reload after creating your character to activate Pantella for this save. If you are seeing this message, Pantella is not active for this save yet.")
 endEvent
 
 Float meterUnits = 71.0210
@@ -25,6 +25,10 @@ Float Function ConvertGameUnitsToMeter(Float gameUnits)
 EndFunction
 
 Event OnPlayerLoadGame()
+    if repository.pantellaInitialized == false
+        repository.pantellaInitialized = true
+        Debug.MessageBox("Pantella has been initialized for this save. Enjoy!")
+    endIf
     RegisterForSingleUpdate(repository.radiantFrequency)
     Actor player = Game.GetPlayer()
     String playerRace = player.GetRace().GetName()
@@ -73,20 +77,30 @@ event OnRaceSwitchComplete()
 EndEvent
 
 event OnUpdate()
-    Debug.Notification("Checking for radiant conversations...")
+    if repository.showDebugNotifications
+        Debug.Notification("Checking for radiant conversations...")
+    endIf
     if repository.radiantEnabled
-        Debug.Notification("Checking for nearby actors...")
+        if repository.showDebugNotifications
+            Debug.Notification("Checking for nearby actors...")
+        endif
         String activeActors = MiscUtil.ReadFromFile("_pantella_active_actors.txt") as String
         ; if no Mantella conversation active
-        Debug.Notification("Active actors: " + activeActors)
+        if repository.showDebugNotifications
+            Debug.Notification("Active actors: " + activeActors)
+        endif
         if activeActors == ""
             ;MantellaActorList taken from this tutorial:
             ;http://skyrimmw.weebly.com/skyrim-modding/detecting-nearby-actors-skyrim-modding-tutorial
             MantellaActorList.start()
-            Debug.Notification("Querying for nearby actors...")
+            if repository.showDebugNotifications
+                Debug.Notification("Querying for nearby actors...")
+            endif
             ; if both actors found
             if (PotentialActor1.GetReference() as Actor) && (PotentialActor2.GetReference() as Actor)
-                Debug.Notification("Found two actors nearby.")
+                if repository.showDebugNotifications
+                    Debug.Notification("Found two actors nearby.")
+                endif
                 Actor Actor1 = PotentialActor1.GetReference() as Actor
                 Actor Actor2 = PotentialActor2.GetReference() as Actor
                 String Actor1Name = Actor1.getdisplayname()
@@ -95,18 +109,24 @@ event OnUpdate()
                 Debug.Notification("Actor 2: " + Actor2Name)
 
                 float distanceToClosestActor = game.getplayer().GetDistance(Actor1)
-                Debug.Notification("Distance to closest actor: " + ConvertGameUnitsToMeter(distanceToClosestActor) + " meters")
+                if repository.showDebugNotifications
+                    Debug.Notification("Distance to closest actor: " + ConvertGameUnitsToMeter(distanceToClosestActor) + " meters")
+                endif
                 float maxDistance = ConvertMeterToGameUnits(repository.radiantDistance)
                 if distanceToClosestActor <= maxDistance
                     float distanceBetweenActors = Actor1.GetDistance(Actor2)
 
-                    Debug.Notification("Distance between actors: " + ConvertGameUnitsToMeter(distanceBetweenActors) + " meters")
+                    if repository.showDebugNotifications
+                        Debug.Notification("Distance between actors: " + ConvertGameUnitsToMeter(distanceBetweenActors) + " meters")
+                    endIf
 
                     ;TODO: make distanceBetweenActors customisable
                     if (distanceBetweenActors <= 1000)
                         MiscUtil.WriteToFile("_pantella_radiant_dialogue.txt", "True", append=false)
 
-                        Debug.Notification("Cast spell on Actor 1 by Actor 2")
+                        if repository.showDebugNotifications
+                            Debug.Notification("Cast spell on Actor 1 by Actor 2")
+                        endIf
                         ;have spell casted on Actor 1 by Actor 2
                         MantellaSpell.Cast(PotentialActor2.GetReference() as ObjectReference, PotentialActor1.GetReference() as ObjectReference)
 
@@ -117,33 +137,45 @@ event OnUpdate()
                         ;     character_selected = MiscUtil.ReadFromFile("_pantella_character_selected.txt") as String
                         ; endWhile
                         Utility.Wait(0.5)
-
-                        Debug.Notification("Waiting for character selection confirmation...")
+                        
+                        if repository.showDebugNotifications
+                            Debug.Notification("Waiting for character selection confirmation...")
+                        endIf
                         String character_selection_enabled = "False"
                         while character_selection_enabled == "False" ; wait for the Mantella spell to give the green light that it is ready to load another actor
                             character_selection_enabled = MiscUtil.ReadFromFile("_pantella_character_selection.txt") as String
                         endWhile
 
-                        Debug.Notification("Cast spell on Actor 2 by Actor 1")
+                        if repository.showDebugNotifications
+                            Debug.Notification("Cast spell on Actor 2 by Actor 1")
+                        endIf
                         MantellaSpell.Cast(PotentialActor1.GetReference() as ObjectReference, PotentialActor2.GetReference() as ObjectReference)
                     else
-                        ;TODO: make this notification optional
-                        Debug.Notification("Radiant dialogue attempted. No NPCs available")
+                        if repository.showDebugNotifications
+                            Debug.Notification("Radiant dialogue attempted. No NPCs available")
+                        endIf
                     endIf
                 else
-                    ;TODO: make this notification optional
-                    Debug.Notification("Radiant dialogue attempted. NPCs too far away at " + ConvertGameUnitsToMeter(distanceToClosestActor) + " meters")
-                    Debug.Notification("Max distance set to " + repository.radiantDistance + "m in Pantella MCM")
+                    if repository.showDebugNotifications
+                        Debug.Notification("Radiant dialogue attempted. NPCs too far away at " + ConvertGameUnitsToMeter(distanceToClosestActor) + " meters")
+                        Debug.Notification("Max distance set to " + repository.radiantDistance + "m in Pantella MCM")
+                    endIf
                 endIf
             else
-                Debug.Notification("Radiant dialogue attempted. No NPCs available")
+                if repository.showDebugNotifications
+                    Debug.Notification("Radiant dialogue attempted. No NPCs available")
+                endIf
             endIf
 
-            Debug.Notification("Radiant conversation check complete, setting up for next check in " + repository.radiantFrequency as string + " seconds.")
+            if repository.showDebugNotifications
+                Debug.Notification("Radiant conversation check complete, setting up for next check in " + repository.radiantFrequency as string + " seconds.")
+            endIf
             MantellaActorList.stop()
         endIf
     endIf
-    Debug.Notification("Radiant conversation check completed.")
+    if repository.showDebugNotifications
+        Debug.Notification("Radiant conversation check completed.")
+    endIf
     RegisterForSingleUpdate(repository.radiantFrequency)
 endEvent
 

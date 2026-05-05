@@ -37,6 +37,7 @@ function RightColumn(MantellaMCM mcm, MantellaRepository Repository) global
 
     mcm.AddHeaderOption("Debug")
     mcm.oid_endFlagMantellaConversationAll = mcm.AddToggleOption("End All Conversations (Fix Repeating NPCs)", Repository.endFlagMantellaConversationAll)
+    mcm.oid_showDebugNotificationsToggle = mcm.AddToggleOption("Show Debug Notifications", Repository.showDebugNotifications)
 endfunction
 
 function SliderOptionOpen(MantellaMCM mcm, int optionID, MantellaRepository Repository) global
@@ -123,6 +124,14 @@ function OptionUpdate(MantellaMCM mcm, int optionID, MantellaRepository Reposito
     ; elseIf optionID == mcm.oid_debugNPCselectMode
     ;     Repository.NPCdebugSelectModeEnabled =! Repository.NPCdebugSelectModeEnabled
     ;     mcm.SetToggleOptionValue(mcm.oid_debugNPCselectMode, Repository.NPCdebugSelectModeEnabled)
+    elseIf optionID == mcm.oid_showDebugNotificationsToggle
+        Repository.showDebugNotifications =! Repository.showDebugNotifications
+        mcm.SetToggleOptionValue(mcm.oid_showDebugNotificationsToggle, Repository.showDebugNotifications)
+        if Repository.showDebugNotifications
+             debug.MessageBox("Debug notifications will now be shown. These notifications are used to show extra information about what Pantella is doing in the background. Useful for debugging and seeing if everything is working properly.")
+        else
+            debug.MessageBox("Debug notifications will now be hidden. These notifications are used to show extra information about what Pantella is doing in the background. Useful for debugging and seeing if everything is working properly.")
+        endif
     elseIf optionID == mcm.oid_radiantenabled
         repository.radiantEnabled =! repository.radiantEnabled
         mcm.SetToggleOptionValue(mcm.oid_radiantenabled, repository.radiantEnabled)
